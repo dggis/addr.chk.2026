@@ -332,7 +332,7 @@ async function mergeAndSave(snap) {
       master.rollbackHistory[snap.company].shift();
   }
   // 이번 업체 데이터 갱신
-  master.companyUploads[snap.company] = { uploadedAt: snap.uploadedAt, regions: snap.regions };
+  master.companyUploads[snap.company] = { uploadedAt: snap.uploadedAt, regions: snap.regions, reportText: snap.reportText || {} };
   // regions 배열 갱신
   snap.regions.forEach(nr => {
     const idx = master.regions.findIndex(r => r.sido===nr.sido && r.sigungu===nr.sigungu);
