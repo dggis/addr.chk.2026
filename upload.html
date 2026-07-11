@@ -51,7 +51,7 @@
     </div>
     <div id="patInputView">
       <p style="font-size:12px;color:var(--muted);line-height:1.7;margin:0 0 10px;">
-        GitHub Personal Access Token(PAT)을 등록하면 파일 업로드 시 <b>자동으로 GitHub에 커밋</b>되어 전체가 즉시 확인할 수 있습니다.<br>
+        GitHub Personal Access Token(PAT)을 등록하면 파일 업로드 시 <b>자동으로 GitHub에 커밋</b>되어 팀원 전체가 즉시 확인할 수 있습니다.<br>
         토큰은 이 기기(브라우저)에만 저장되며 외부로 전송되지 않습니다.
       </p>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -235,18 +235,30 @@ function handleFile(file) {
 function parseCompanyTemplate(buf, company, dateStr, fileName) {
   const wb = XLSX.read(buf, {type:'array', raw:true});
 
-  // 시트 1: 주간보고내용 (텍스트)
+  // 시트 1: 주간보고내용 (텍스트) — 키워드로 섹션 탐색
   let reportText = { reporter:'', weeklyWork:'', plan:'', note:'' };
   const ws1 = wb.Sheets['주간보고내용'];
   if (ws1) {
-    const a = XLSX.utils.sheet_to_json(ws1, {header:1, defval:null, raw:true});
-    // row2=보고자(B2), row3=기준일자(B3), row4=보고기간(B4)
-    // row8=금주실적 헤더, row9~12=내용, row14=추진계획, row15~19=내용, row20=기타, row21~=내용
-    const getCell = (r,c) => (a[r]||[])[c];
-    reportText.reporter   = getCell(1,1) || '';
-    reportText.weeklyWork = getCell(8,0) || '';   // row9 = 금주실적 내용
-    reportText.plan       = getCell(14,0) || '';  // row15 = 추진계획 내용 (fix: 13→14)
-    reportText.note       = getCell(20,0) || '';  // row21 = 기타 내용 (fix: 19→20)
+    const a = XLSX.utils.sheet_to_json(ws1, {header:1, defval:null, raw:false});
+    // 보고자: B3 (row2, col1)
+    reportText.reporter = ((a[2]||[])[1] || '').toString().trim();
+    // 섹션별: 제목 행 찾고 다음 행 값 읽기
+    function findNextCell(keyword) {
+      for (let r=0; r<a.length; r++) {
+        const rowStr = (a[r]||[]).map(c=>c==null?'':String(c)).join('');
+        if (rowStr.includes(keyword)) {
+          // 다음 행의 A열 값 반환
+          for (let nr=r+1; nr<=r+3; nr++) {
+            const val = ((a[nr]||[])[0] || '').toString().trim();
+            if (val && !val.startsWith('[입력]') && val.length > 2) return val;
+          }
+        }
+      }
+      return '';
+    }
+    reportText.weeklyWork = findNextCell('금주 실적');
+    reportText.plan       = findNextCell('추진계획');
+    reportText.note       = findNextCell('기타');
   }
 
   // 시트 2: 주간실적입력 (숫자)
