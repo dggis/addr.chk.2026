@@ -119,22 +119,30 @@ async function renderWeekly(date) {
     kpiCard('잔여건수', fmt(t.remain)),
   ].join('');
 
-  // 업체별 텍스트 보고 표시
+  // 업체별 텍스트 보고 표시 (금주실적만)
   const uploads = snap.companyUploads || {};
   const textHtml = Object.entries(uploads).map(([company, data]) => {
     const rt = data.reportText || {};
-    const hasText = rt.weeklyWork || rt.plan || rt.note;
-    if (!hasText) return '';
-    return `<div class="card" style="margin-bottom:10px;">
-      <div class="card-h">${company} <span class="meta">${(data.uploadedAt||'').slice(0,10)}</span></div>
-      <div class="card-pad" style="display:flex;flex-direction:column;gap:10px;">
-        ${rt.weeklyWork ? `<div><div style="font-size:11.5px;font-weight:800;color:var(--navy);margin-bottom:4px;">□ 금주 실적</div><div style="font-size:13px;white-space:pre-wrap;color:var(--text);">${rt.weeklyWork.replace('[입력]','').trim()}</div></div>` : ''}
-        ${rt.plan ? `<div><div style="font-size:11.5px;font-weight:800;color:var(--navy);margin-bottom:4px;">□ 추진계획</div><div style="font-size:13px;white-space:pre-wrap;color:var(--text);">${rt.plan.replace('[입력]','').trim()}</div></div>` : ''}
-        ${rt.note ? `<div><div style="font-size:11.5px;font-weight:800;color:var(--navy);margin-bottom:4px;">□ 기타</div><div style="font-size:13px;white-space:pre-wrap;color:var(--text);">${rt.note.replace('[입력]','').trim()}</div></div>` : ''}
-      </div>
-    </div>`;
+    const work = (rt.weeklyWork||'').replace('[입력]','').trim();
+    if (!work) return '';
+    return '<div class="card" style="margin-bottom:10px;">'
+      + '<div class="card-h">' + company + ' <span class="meta">' + (data.uploadedAt||'').slice(0,10) + '</span></div>'
+      + '<div class="card-pad">'
+      + '<div style="font-size:11.5px;font-weight:800;color:var(--navy);margin-bottom:6px;">□ 금주 실적</div>'
+      + '<div style="font-size:13px;white-space:pre-wrap;color:var(--text);line-height:1.7;">' + work + '</div>'
+      + '</div></div>';
   }).join('');
-  $('#weeklyTextReports').innerHTML = textHtml || `<div class="empty" style="font-size:13px;color:var(--muted);padding:10px 0;">업체별 보고 내용이 없습니다 (템플릿의 시트1 내용이 여기에 표시됩니다)</div>`;
+  $('#weeklyTextReports').innerHTML = textHtml || '<div class="empty" style="font-size:13px;color:var(--muted);padding:10px 0;">업체별 보고 내용이 없습니다 (템플릿 시트1 금주실적이 여기 표시됩니다)</div>';
+
+  // 추진계획 → 차주 계획 칸에 자동 표시 (비어있을 때만)
+  const wkPlanEl = $('#wkPlan');
+  if (wkPlanEl && !wkPlanEl.value) {
+    const plans = Object.entries(uploads).map(([co, d]) => {
+      const p = ((d.reportText||{}).plan||'').replace('[입력]','').trim();
+      return p ? ('[' + co + ']\n' + p) : '';
+    }).filter(Boolean).join('\n\n');
+    if (plans) wkPlanEl.value = plans;
+  }
 
   const top = [...snap.regions].sort((a,b)=>b.thisWeek-a.thisWeek).filter(r=>r.thisWeek>0).slice(0,15);
   $('#weeklyTop').innerHTML = top.length ? `<table class="dt"><thead><tr>

@@ -36,8 +36,13 @@
 
 <div class="content">
 
-  <!-- 이번 주 업로드 현황 -->
-  <div class="section-title">이번 주 업로드 현황 <span class="tag" id="currentWeekTag">-</span></div>
+  <!-- 업로드 현황 -->
+  <div class="section-title">업로드 현황
+    <div style="display:flex;align-items:center;gap:8px;">
+      <select id="statusWeekSelect" style="font-size:12px;font-weight:700;padding:4px 8px;border:1px solid var(--line);border-radius:8px;font-family:inherit;background:#fff;"></select>
+      <span class="tag" id="currentWeekTag"></span>
+    </div>
+  </div>
   <div class="co-grid" id="companyStatusGrid"></div>
 
   <!-- GitHub 자동 커밋 설정 -->
@@ -154,13 +159,15 @@ function parseFilename(name) {
   const dateStr = `${d.slice(0,4)}-${d.slice(4,6)}-${d.slice(6,8)}`;
   return { company, dateStr };
 }
-function thisThursday() {
+function lastThursday() {
+  // 직전 목요일 (오늘이 목요일이면 오늘, 그 전이면 지난 목요일)
   const now = new Date();
-  const day = now.getDay(); // 0=Sun,4=Thu
-  const diff = (4 - day + 7) % 7;
-  const thu = new Date(now); thu.setDate(now.getDate() + diff);
+  const day = now.getDay(); // 0=Sun,1=Mon,...4=Thu,5=Fri,6=Sat
+  const diff = (day - 4 + 7) % 7; // 목요일로부터 며칠 지났나
+  const thu = new Date(now); thu.setDate(now.getDate() - diff);
   return thu.toISOString().slice(0,10);
 }
+function thisThursday() { return lastThursday(); }
 
 // ---- config 로드 ----
 async function loadConfig() {
@@ -180,19 +187,35 @@ function templateFilename(company) {
 }
 
 // ---- 회사 상태 그리드 ----
-async function renderCompanyGrid() {
+async function renderCompanyGrid(selectedDate) {
   const cfg = await loadConfig();
-  const currentWeek = thisThursday();
-  $('#currentWeekTag').textContent = `${currentWeek} 기준`;
-  const master = LocalStore.getMasterWeek(currentWeek);
+  // 주차 선택 드롭다운 구성
+  const sel = $('#statusWeekSelect');
+  const allWeeks = await DataLayer.listAllWeeks();
+  const defaultDate = selectedDate || lastThursday();
+  if (sel.options.length === 0 || selectedDate === undefined) {
+    // 저장된 주차 + 오늘 기준 직전 목요일
+    const dateSet = new Set(allWeeks.map(w=>w.date));
+    dateSet.add(defaultDate);
+    const sorted = [...dateSet].sort().reverse();
+    sel.innerHTML = sorted.map(d=>`<option value="${d}">${d}</option>`).join('');
+    sel.value = sorted[0];
+    sel.onchange = () => renderCompanyGrid(sel.value);
+  }
+  const currentWeek = sel.value || defaultDate;
+  $('#currentWeekTag').textContent = `기준`;
+  const master = LocalStore.getMasterWeek(currentWeek) || await DataLayer.getWeek(currentWeek);
   const uploads = master?.companyUploads || {};
-  $('#companyStatusGrid').innerHTML = cfg.companies.map(c => {
+  const companies = cfg.companies.length ? cfg.companies : [
+    {name:'대국지아이에스'},{name:'내가시스템'},{name:'더퍼스트아이씨티'},{name:'새한항업'},{name:'웨이즈원'}
+  ];
+  $('#companyStatusGrid').innerHTML = companies.map(c => {
     const up = uploads[c.name];
     const done = !!up;
     const time = done ? new Date(up.uploadedAt).toLocaleString('ko-KR',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
     return `<div class="co-card ${done?'done':'missing'}">
       <div class="co-name">${c.name}</div>
-      <div class="co-status ${done?'done':'missing'}">${done?'업로드 완료':'미업로드'}</div>
+      <div class="co-status ${done?'done':'missing'}">${done?'✅ 업로드 완료':'⏳ 미업로드'}</div>
       ${done?`<div class="co-time">${time}</div>`:''}
     </div>`;
   }).join('');
@@ -585,6 +608,18 @@ $('#applyKaisBtn').addEventListener('click', ()=>{
   alert(`${updated}개 지역의 정상/훼손/망실 데이터가 반영되었습니다.`);
 });
 
+// ---- 템플릿 다운로드 링크 (하드코딩으로 보장) ----
+async function renderTemplateLinks() {
+  const companies = ['대국지아이에스','내가시스템','더퍼스트아이씨티','새한항업','웨이즈원'];
+  const el = $('#templateLinks');
+  if (!el) return;
+  el.innerHTML = companies.map(c =>
+    `<a href="templates/[${encodeURIComponent(c)}]기초번호판설치점검_주간보고_템플릿.xlsx"
+        download="[${c}]기초번호판설치점검_주간보고_템플릿.xlsx"
+        class="btn outline sm" style="min-width:130px;text-decoration:none;">${c}</a>`
+  ).join('');
+}
+
 // ---- 초기화 ----
 (async function init(){
   renderNav('upload');
@@ -592,7 +627,7 @@ $('#applyKaisBtn').addEventListener('click', ()=>{
   await loadConfig();
   await renderCompanyGrid();
   await renderWeekHistory();
-  await renderTemplateLinks();
+  renderTemplateLinks();
 })();
 </script>
 </body>
