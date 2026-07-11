@@ -51,7 +51,7 @@
     </div>
     <div id="patInputView">
       <p style="font-size:12px;color:var(--muted);line-height:1.7;margin:0 0 10px;">
-        GitHub Personal Access Token(PAT)을 등록하면 파일 업로드 시 <b>자동으로 GitHub에 커밋</b>되어 전체가 즉시 확인할 수 있습니다.<br>
+        GitHub Personal Access Token(PAT)을 등록하면 파일 업로드 시 <b>자동으로 GitHub에 커밋</b>되어 팀원 전체가 즉시 확인할 수 있습니다.<br>
         토큰은 이 기기(브라우저)에만 저장되며 외부로 전송되지 않습니다.
       </p>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -94,13 +94,12 @@
 
   <!-- 주차별 현황 + 롤백 -->
   <div class="section-title">주차별 업로드 이력 <span class="tag">누적 저장 · 롤백 가능</span></div>
-  <div class="note-box" style="margin-bottom:10px;">
-    매주 업로드할 때마다 이력이 쌓입니다. <b>보고 내용이 이전 데이터로 보이면</b> 해당 주차 <b>"로컬삭제"</b> 후 재업로드하세요.
-  </div>
+  <div class="note-box" style="margin-bottom:10px;font-size:12px;color:var(--muted);">매주 업로드할 때마다 이력이 쌓입니다. <b>보고 내용이 이전 데이터로 보이면</b> 해당 주차 <b>"로컬삭제"</b> 후 재업로드하세요.</div>
   <div class="card" id="weekHistoryCard">
     <div class="empty">불러오는 중…</div>
   </div>
 
+  
   <!-- 템플릿 다운로드 -->
   <div class="section-title">업체별 입력 템플릿 다운로드</div>
   <div class="card card-pad">
@@ -478,59 +477,6 @@ $('#saveBtn').addEventListener('click', async ()=>{
   }
 });
 $('#cancelBtn').addEventListener('click', ()=>{ PENDING=null; $('#previewCard').classList.add('hidden'); });
-
-// ---- 내보내기 ----
-$('#exportIndexBtn').addEventListener('click', ()=>{
-  const weeks = LocalStore.listWeeks();
-  downloadJSON({weeks}, 'index.json');
-});
-$('#exportLatestBtn').addEventListener('click', ()=>{
-  const weeks = LocalStore.listWeeks();
-  if (!weeks.length) { alert('저장된 데이터가 없습니다.'); return; }
-  const date = weeks[weeks.length-1];
-  const master = LocalStore.getMasterWeek(date);
-  downloadJSON(master, `${date}.json`);
-});
-$('#exportByRegionBtn').addEventListener('click', ()=>{
-  const weeks = LocalStore.listWeeks();
-  const out = {};
-  weeks.forEach(date=>{
-    const m = LocalStore.getMasterWeek(date);
-    if (!m) return;
-    m.regions.forEach(r=>{
-      const key = `${r.sido} ${r.sigungu}`;
-      if (!out[key]) out[key]=[];
-      out[key].push({date, vendor:r.vendor, target:r.target, thisWeek:r.thisWeek, cumulative:r.cumulative, progress:r.progress, normal:r.normal, damage:r.damage, lost:r.lost});
-    });
-  });
-  downloadJSON(out, `시군구별_통합_${new Date().toISOString().slice(0,10)}.json`);
-});
-$('#exportByVendorBtn').addEventListener('click', ()=>{
-  const weeks = LocalStore.listWeeks();
-  const out = {};
-  weeks.forEach(date=>{
-    const m = LocalStore.getMasterWeek(date);
-    if (!m) return;
-    const map = {};
-    m.regions.forEach(r=>{
-      if (!map[r.vendor]) map[r.vendor]={count:0,target:0,thisWeek:0,cumulative:0};
-      map[r.vendor].count++; map[r.vendor].target+=r.target; map[r.vendor].thisWeek+=r.thisWeek; map[r.vendor].cumulative+=r.cumulative;
-    });
-    Object.entries(map).forEach(([name,v])=>{
-      if (!out[name]) out[name]=[];
-      out[name].push({date, ...v, progress:v.target?v.cumulative/v.target:0});
-    });
-  });
-  downloadJSON(out, `업체별_통합_${new Date().toISOString().slice(0,10)}.json`);
-});
-
-// ---- 템플릿 다운로드 링크 ----
-async function renderTemplateLinks() {
-  const cfg = await loadConfig();
-  $('#templateLinks').innerHTML = cfg.companies.map(c=>`
-    <a href="templates/[${c.name}]기초번호판설치점검_주간보고_템플릿.xlsx" download class="btn outline sm" style="min-width:140px;text-decoration:none;">${c.name}</a>
-  `).join('');
-}
 
 // ---- KAIS 파일 파싱 ----
 let KAIS_DATA = null;
