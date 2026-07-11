@@ -59,7 +59,7 @@
         <button class="btn sm" id="savePatBtn" style="flex:none;">토큰 저장</button>
         <a href="#" target="_blank" class="btn outline sm" style="flex:none;text-decoration:none;">토큰 발급하기</a>
       </div>
-      <p style="font-size:11px;color:var(--muted);margin:8px 0 0;">토큰 발급 시 <b>repo</b> 권한만 선택하세요.</p>
+      <p style="font-size:11px;color:var(--muted);margin:8px 0 0;">토큰 삭제 방법  <b>Ctrl + Shift + Delete</b> 누른 후, [전체 기간(모든시간)] 선택 및 삭제.</p>
     </div>
   </div>
 
@@ -244,9 +244,9 @@ function parseCompanyTemplate(buf, company, dateStr, fileName) {
     // row8=금주실적 헤더, row9~12=내용, row14=추진계획, row15~19=내용, row20=기타, row21~=내용
     const getCell = (r,c) => (a[r]||[])[c];
     reportText.reporter   = getCell(1,1) || '';
-    reportText.weeklyWork = getCell(8,0) || '';
-    reportText.plan       = getCell(13,0) || '';
-    reportText.note       = getCell(19,0) || '';
+    reportText.weeklyWork = getCell(8,0) || '';   // row9 = 금주실적 내용
+    reportText.plan       = getCell(14,0) || '';  // row15 = 추진계획 내용 (fix: 13→14)
+    reportText.note       = getCell(20,0) || '';  // row21 = 기타 내용 (fix: 19→20)
   }
 
   // 시트 2: 주간실적입력 (숫자)
