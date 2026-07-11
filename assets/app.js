@@ -3,6 +3,54 @@
    업체별 주간 실적 병합 구조 지원
    ============================================================ */
 
+// ---- GitHub PAT 자동 커밋 ----
+const LS_PAT = 'kaba_gh_pat';
+const GH_OWNER = 'dggis';
+const GH_REPO  = 'addr.chk.2026';
+const GH_BRANCH = 'main';
+
+const GitHubCommit = {
+  getPAT() { return localStorage.getItem(LS_PAT) || ''; },
+  setPAT(token) { localStorage.setItem(LS_PAT, token); },
+  clearPAT() { localStorage.removeItem(LS_PAT); },
+  hasPAT() { return !!this.getPAT(); },
+
+  async _getFileSHA(path) {
+    const res = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${path}?ref=${GH_BRANCH}`, {
+      headers: { Authorization: `Bearer ${this.getPAT()}`, Accept: 'application/vnd.github+json' }
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.sha || null;
+  },
+
+  async putFile(path, jsonObj, msg) {
+    const sha = await this._getFileSHA(path);
+    const body = {
+      message: msg,
+      content: btoa(unescape(encodeURIComponent(JSON.stringify(jsonObj, null, 2)))),
+      branch: GH_BRANCH,
+    };
+    if (sha) body.sha = sha;
+    const res = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${path}`, {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${this.getPAT()}`, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(()=>({}));
+      throw new Error(err.message || `GitHub 오류 (${res.status})`);
+    }
+    return true;
+  },
+
+  async commitWeek(date, master) {
+    const weeks = LocalStore.listWeeks();
+    await this.putFile(`data/weekly/${date}.json`, master, `chore: ${date} 주차 데이터 업로드`);
+    await this.putFile('data/index.json', { weeks }, `chore: index.json 갱신 (${date})`);
+  }
+};
+
 // ---- LocalStore ----
 const LS_MASTER_PREFIX = 'kaba_master_';
 const LS_WEEKS = 'kaba_weeks';
