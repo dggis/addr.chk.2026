@@ -40,6 +40,29 @@
   <div class="section-title">이번 주 업로드 현황 <span class="tag" id="currentWeekTag">-</span></div>
   <div class="co-grid" id="companyStatusGrid"></div>
 
+  <!-- GitHub 자동 커밋 설정 -->
+  <div class="section-title">GitHub 자동 커밋 설정 <span class="tag">한 번만 설정하면 저장 즉시 공유</span></div>
+  <div class="card card-pad" id="patSection">
+    <div id="patSetView" class="hidden">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <span style="font-size:13px;">✅ GitHub 토큰이 등록되어 있습니다. 업로드 시 자동으로 GitHub에 커밋됩니다.</span>
+        <button class="btn outline sm" id="clearPatBtn">토큰 삭제</button>
+      </div>
+    </div>
+    <div id="patInputView">
+      <p style="font-size:12px;color:var(--muted);line-height:1.7;margin:0 0 10px;">
+        GitHub Personal Access Token(PAT)을 등록하면 파일 업로드 시 <b>자동으로 GitHub에 커밋</b>되어 팀원 전체가 즉시 확인할 수 있습니다.<br>
+        토큰은 이 기기(브라우저)에만 저장되며 외부로 전송되지 않습니다.
+      </p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <input id="patInput" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" style="flex:1;min-width:200px;border:1px solid var(--line);border-radius:9px;padding:9px 12px;font-size:13px;font-family:inherit;">
+        <button class="btn sm" id="savePatBtn" style="flex:none;">토큰 저장</button>
+        <a href="https://github.com/settings/tokens/new?scopes=repo&description=기초번호판보고시스템" target="_blank" class="btn outline sm" style="flex:none;text-decoration:none;">토큰 발급하기</a>
+      </div>
+      <p style="font-size:11px;color:var(--muted);margin:8px 0 0;">토큰 발급 시 <b>repo</b> 권한만 선택하세요.</p>
+    </div>
+  </div>
+
   <!-- 업로드 -->
   <div class="section-title">파일 업로드</div>
   <div class="upload-card" id="dropZone">
@@ -392,7 +415,28 @@ async function renderWeekHistory() {
   $('#weekHistoryCard').innerHTML = html;
 }
 
-// ---- 이벤트 바인딩 ----
+// ---- PAT 설정 UI ----
+function renderPatUI() {
+  const has = GitHubCommit.hasPAT();
+  $('#patSetView').classList.toggle('hidden', !has);
+  $('#patInputView').classList.toggle('hidden', has);
+}
+$('#savePatBtn').addEventListener('click', ()=>{
+  const val = $('#patInput').value.trim();
+  if (!val.startsWith('ghp_') && !val.startsWith('github_pat_')) {
+    alert('올바른 GitHub PAT 형식이 아닙니다. ghp_ 또는 github_pat_ 으로 시작해야 합니다.');
+    return;
+  }
+  GitHubCommit.setPAT(val);
+  $('#patInput').value = '';
+  renderPatUI();
+  alert('✅ GitHub 토큰이 저장되었습니다. 이제 업로드 시 자동으로 커밋됩니다.');
+});
+$('#clearPatBtn').addEventListener('click', ()=>{
+  if (confirm('GitHub 토큰을 삭제할까요?')) { GitHubCommit.clearPAT(); renderPatUI(); }
+});
+
+// ---- 저장 버튼 (PAT 있으면 자동 커밋) ----
 $('#pickBtn').addEventListener('click', ()=>$('#fileInput').click());
 $('#fileInput').addEventListener('change', e=>{ if(e.target.files[0]) handleFile(e.target.files[0]); });
 const dz = $('#dropZone');
@@ -400,6 +444,7 @@ const dz = $('#dropZone');
 ['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('drag');}));
 dz.addEventListener('drop', e=>{ const f=e.dataTransfer.files[0]; if(f) handleFile(f); });
 
+// ---- 이벤트 바인딩 ----
 $('#saveBtn').addEventListener('click', async ()=>{
   if (!PENDING) return;
   $('#saveBtn').disabled = true;
@@ -407,9 +452,21 @@ $('#saveBtn').addEventListener('click', async ()=>{
   statusEl.style.display = 'block';
   statusEl.innerHTML = '⏳ 저장 중…';
   try {
-    await mergeAndSave(PENDING);
-    statusEl.innerHTML = `✅ <b>${PENDING.company}</b> ${PENDING.dateStr} 주차 데이터가 저장되었습니다.`;
+    const master = await mergeAndSave(PENDING);
+    const date = PENDING.dateStr;
     PENDING = null;
+
+    if (GitHubCommit.hasPAT()) {
+      statusEl.innerHTML = '⏳ GitHub에 자동 커밋 중…';
+      try {
+        await GitHubCommit.commitWeek(date, master);
+        statusEl.innerHTML = `✅ <b>${date}</b> 주차가 GitHub에 저장되었습니다. 팀원이 새로고침하면 바로 확인 가능합니다.`;
+      } catch(gitErr) {
+        statusEl.innerHTML = `💾 이 기기에 저장됨. GitHub 커밋 실패: ${gitErr.message}<br><span style="font-size:11px;">토큰 권한(repo)을 확인하거나 JSON 내보내기로 수동 커밋하세요.</span>`;
+      }
+    } else {
+      statusEl.innerHTML = `💾 이 기기에 저장되었습니다. <b>GitHub 자동 커밋 설정</b>을 하면 팀원과 즉시 공유할 수 있습니다.`;
+    }
     await renderCompanyGrid();
     await renderWeekHistory();
     $('#previewCard').classList.add('hidden');
@@ -584,6 +641,7 @@ $('#applyKaisBtn').addEventListener('click', ()=>{
 // ---- 초기화 ----
 (async function init(){
   renderNav('upload');
+  renderPatUI();
   await loadConfig();
   await renderCompanyGrid();
   await renderWeekHistory();
