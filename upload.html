@@ -46,7 +46,7 @@
   <div class="co-grid" id="companyStatusGrid"></div>
 
   <!-- GitHub 자동 커밋 설정 -->
-  <div class="section-title">GitHub 자동 커밋 설정 <span class="tag">한 번만 설정하면 저장 즉시 반영</span></div>
+  <div class="section-title">GitHub 자동 커밋 설정 <span class="tag">한 번만 설정하면 저장 즉시 공유</span></div>
   <div class="card card-pad" id="patSection">
     <div id="patSetView" class="hidden">
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
@@ -324,16 +324,26 @@ function showPreview(snap) {
 async function mergeAndSave(snap) {
   const cfg = await loadConfig();
   const date = snap.dateStr;
-  // 기존 마스터 로드
+
+  // 1. 로컬 → 없으면 GitHub에서 읽기 (다른 업체가 이미 올린 데이터 보존)
   let master = LocalStore.getMasterWeek(date);
+  if (!master && GitHubCommit.hasPAT()) {
+    try {
+      const ghFile = await GitHubCommit.getFile(`data/weekly/${date}.json`);
+      if (ghFile?.content) {
+        master = ghFile.content;
+        console.log(`GitHub에서 ${date} 기존 데이터 로드 (${Object.keys(master.companyUploads||{}).length}개 업체 보존)`);
+      }
+    } catch(e) {}
+  }
+
   if (!master) {
-    // 새 마스터 초기화
+    // 완전 새 마스터 초기화
     master = {
       baseDate: date, weekStart: snap.weekStart, weekEnd: snap.weekEnd,
       uploadedAt: new Date().toISOString(), companyUploads: {}, regions: [],
       rollbackHistory: {}
     };
-    // config의 모든 지자체 초기화
     cfg.companies.forEach(c => c.regions.forEach(r => {
       master.regions.push({
         sido:r.sido, sigungu:r.sigungu, vendor:c.name,
