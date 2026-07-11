@@ -135,14 +135,11 @@ async function renderWeekly(date) {
   $('#weeklyTextReports').innerHTML = textHtml || '<div class="empty" style="font-size:13px;color:var(--muted);padding:10px 0;">업체별 보고 내용이 없습니다 (템플릿 시트1 금주실적이 여기 표시됩니다)</div>';
 
   // 추진계획 → 차주 계획 칸에 자동 표시 (비어있을 때만)
-  const wkPlanEl = $('#wkPlan');
-  if (wkPlanEl && !wkPlanEl.value) {
-    const plans = Object.entries(uploads).map(([co, d]) => {
-      const p = ((d.reportText||{}).plan||'').replace('[입력]','').trim();
-      return p ? ('[' + co + ']\n' + p) : '';
-    }).filter(Boolean).join('\n\n');
-    if (plans) wkPlanEl.value = plans;
-  }
+  // 차주 계획 auto-fill은 loadNote 이후에 처리 (아래 참고)
+  const _planFromTemplate = Object.entries(uploads).map(([co, d]) => {
+    const p = ((d.reportText||{}).plan||'').replace('[입력]','').trim();
+    return p ? ('[' + co + ']\n' + p) : '';
+  }).filter(Boolean).join('\n\n');
 
   const top = [...snap.regions].sort((a,b)=>b.thisWeek-a.thisWeek).filter(r=>r.thisWeek>0).slice(0,15);
   $('#weeklyTop').innerHTML = top.length ? `<table class="dt"><thead><tr>
@@ -152,6 +149,11 @@ async function renderWeekly(date) {
     </tbody></table>` : `<div class="empty">금주 점검 실적이 입력된 지역이 없습니다</div>`;
 
   loadNote('wkIssue','wk-issue',date); loadNote('wkPlan','wk-plan',date); loadNote('wkRound','wk-round',date);
+  // loadNote 이후 textarea가 비어있으면 템플릿의 추진계획으로 채움
+  const wkPlanEl = $('#wkPlan');
+  if (wkPlanEl && !wkPlanEl.value && _planFromTemplate) {
+    wkPlanEl.value = _planFromTemplate;
+  }
   $('#appSub').textContent = `기준일자 ${snap.baseDate} · ${snap.weekStart||''} ~ ${snap.weekEnd||''}`;
 }
 

@@ -46,7 +46,7 @@
   <div class="co-grid" id="companyStatusGrid"></div>
 
   <!-- GitHub 자동 커밋 설정 -->
-  <div class="section-title">GitHub 자동 커밋 설정 <span class="tag">한 번만 설정하면 저장 즉시 공유</span></div>
+  <div class="section-title">GitHub 자동 커밋 설정 <span class="tag">한 번만 설정하면 저장 즉시 반영</span></div>
   <div class="card card-pad" id="patSection">
     <div id="patSetView" class="hidden">
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
@@ -56,8 +56,8 @@
     </div>
     <div id="patInputView">
       <p style="font-size:12px;color:var(--muted);line-height:1.7;margin:0 0 10px;">
-        GitHub Personal Access Token(PAT)을 등록하면 파일 업로드 시 <b>자동으로 GitHub에 커밋</b>되어 팀원 전체가 즉시 확인할 수 있습니다.<br>
-        토큰은 이 기기(브라우저)에만 저장되며 외부로 전송되지 않습니다.
+        GitHub Personal Access Token(PAT)을 등록하면 파일 업로드 시 <b>자동으로 GitHub에 커밋</b>되어 전체가 즉시 확인할 수 있습니다.<br>
+        토큰은 이 브라우저에만 저장되며 외부로 전송되지 않습니다.
       </p>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <input id="patInput" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" style="flex:1;min-width:200px;border:1px solid var(--line);border-radius:9px;padding:9px 12px;font-size:13px;font-family:inherit;">
@@ -90,7 +90,7 @@
       </div>
       <div class="kpi-grid" id="prevKpis" style="margin-top:6px;"></div>
       <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
-        <button class="btn" id="saveBtn" style="flex:1;min-width:160px;">이 기기에 저장</button>
+        <button class="btn" id="saveBtn" style="flex:1;min-width:160px;">업로드</button>
         <button class="btn outline" id="cancelBtn" style="flex:1;min-width:100px;">취소</button>
       </div>
       <div id="saveStatus" style="margin-top:10px;display:none;" class="note-box"></div>
@@ -99,7 +99,7 @@
 
   <!-- 주차별 현황 + 롤백 -->
   <div class="section-title">주차별 업로드 이력 <span class="tag">누적 저장 · 롤백 가능</span></div>
-  <div class="note-box" style="margin-bottom:10px;font-size:12px;color:var(--muted);">매주 업로드할 때마다 이력이 쌓입니다. <b>보고 내용이 이전 데이터로 보이면</b> 해당 주차 <b>"로컬삭제"</b> 후 재업로드하세요.</div>
+  <div class="note-box" style="margin-bottom:10px;font-size:12px;color:var(--muted);">매주 업로드할 때마다 이력이 쌓입니다. <b>같은 날짜(주차)로 다시 업로드하면 자동으로 덮어씌워집니다.</b> 별도 삭제 불필요.</div>
   <div class="card" id="weekHistoryCard">
     <div class="empty">불러오는 중…</div>
   </div>
@@ -483,12 +483,12 @@ $('#saveBtn').addEventListener('click', async ()=>{
       statusEl.innerHTML = '⏳ GitHub에 자동 커밋 중…';
       try {
         await GitHubCommit.commitWeek(date, master);
-        statusEl.innerHTML = `✅ <b>${date}</b> 주차가 GitHub에 저장되었습니다. 팀원이 새로고침하면 바로 확인 가능합니다.`;
+        statusEl.innerHTML = `✅ <b>${date}</b> 주차가 GitHub에 저장되었습니다. 새로고침하면 바로 확인 가능합니다.`;
       } catch(gitErr) {
-        statusEl.innerHTML = `💾 이 기기에 저장됨. GitHub 커밋 실패: ${gitErr.message}<br><span style="font-size:11px;">토큰 권한(repo)을 확인하거나 JSON 내보내기로 수동 커밋하세요.</span>`;
+        statusEl.innerHTML = `💾 저장됨. GitHub 커밋 실패: ${gitErr.message}<br><span style="font-size:11px;">토큰 권한(repo)을 확인하거나 JSON 내보내기로 수동 커밋하세요.</span>`;
       }
     } else {
-      statusEl.innerHTML = `💾 이 기기에 저장되었습니다. <b>GitHub 자동 커밋 설정</b>을 하면 팀원과 즉시 공유할 수 있습니다.`;
+      statusEl.innerHTML = `💾 저장되었습니다. <b>GitHub 자동 커밋 설정</b>을 하면 즉시 공유할 수 있습니다.`;
     }
     await renderCompanyGrid();
     await renderWeekHistory();
