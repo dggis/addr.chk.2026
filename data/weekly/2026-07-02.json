@@ -2,10 +2,237 @@
   "baseDate": "2026-07-02",
   "weekStart": "2026-06-26",
   "weekEnd": "2026-07-02",
-  "uploadedAt": "2026-07-12T03:44:30.180Z",
+  "uploadedAt": "2026-07-12T04:57:21.653Z",
   "companyUploads": {
-    "대국지아이에스": {
+    "ëêµ­ì§ìì´ìì¤": {
       "uploadedAt": "2026-07-12T03:44:27.507Z",
+      "regions": [
+        {
+          "sido": "ê°ìí¹ë³ìì¹ë",
+          "sigungu": "ëí´ì",
+          "target": 405,
+          "thisWeek": 0,
+          "normal": 0,
+          "damage": 0,
+          "lost": 0
+        },
+        {
+          "sido": "ê°ìí¹ë³ìì¹ë",
+          "sigungu": "ììêµ°",
+          "target": 2397,
+          "thisWeek": 0,
+          "normal": 0,
+          "damage": 0,
+          "lost": 0
+        },
+        {
+          "sido": "ê²½ìë¨ë",
+          "sigungu": "ë¨í´êµ°",
+          "target": 1015,
+          "thisWeek": 0,
+          "normal": 0,
+          "damage": 0,
+          "lost": 0
+        },
+        {
+          "sido": "ê²½ìë¨ë",
+          "sigungu": "ë°ìì",
+          "target": 1104,
+          "thisWeek": 0,
+          "normal": 0,
+          "damage": 0,
+          "lost": 0
+        },
+        {
+          "sido": "ê²½ìë¨ë",
+          "sigungu": "ì¬ì²ì",
+          "target": 1443,
+          "thisWeek": 0,
+          "normal": 0,
+          "damage": 0,
+          "lost": 0
+        },
+        {
+          "sido": "ê²½ìë¨ë",
+          "sigungu": "ìì°ì",
+          "target": 782,
+          "thisWeek": 0,
+          "normal": 0,
+          "damage": 0,
+          "lost": 0
+        },
+        {
+          "sido": "ê²½ìë¨ë",
+          "sigungu": "ìë ¹êµ°",
+          "target": 974,
+          "thisWeek": 0,
+          "normal": 0,
+          "damage": 0,
+          "lost": 0
+        },
+        {
+          "sido": "ê²½ìë¨ë",
+          "sigungu": "ì§ì£¼ì",
+          "target": 787,
+          "thisWeek": 0,
+          "normal": 0,
+          "damage": 0,
+          "lost": 0
+        },
+        {
+          "sido": "ê²½ìë¨ë",
+          "sigungu": "ì°½ìì ë§ì°í©í¬êµ¬",
+          "target": 312,
+          "thisWeek": 0,
+          "normal": 0,
+          "damage": 0,
+          "lost": 0
+        },
+        {
+          "sido": "ê²½ìë¨ë",
+          "sigungu": "ì°½ìì ë§ì°íìêµ¬",
+          "target": 392,
+          "thisWeek": 0,
+          "normal": 0,
+          "damage": 0,
+          "lost": 0
+        },
+        {
+          "sido": "ê²½ìë¨ë",
+          "sigungu": "ì°½ìì ì±ì°êµ¬",
+          "target": 43,
+          "thisWeek": 0,
+          "normal": 0,
+          "damage": 0,
+          "lost": 0
+        },
+        {
+          "sido": "ê²½ìë¨ë",
+          "sigungu": "ì°½ìì ìì°½êµ¬",
+          "target": 76,
+          "thisWeek": 0,
+          "normal": 0,
+          "damage": 0,
+          "lost": 0
+        },
+        {
+          "sido": "ê²½ìë¨ë",
+          "sigungu": "ì°½ìì ì§í´êµ¬",
+          "target": 208,
+          "thisWeek": 0,
+          "normal": 0,
+          "damage": 0,
+          "lost": 0
+        },
+        {
+          "sido": "ê²½ìë¨ë",
+          "sigungu": "íëêµ°",
+          "target": 968,
+          "thisWeek": 0,
+          "normal": 0,
+          "damage": 0,
+          "lost": 0
+        },
+        {
+          "sido": "ê²½ìë¨ë",
+          "sigungu": "í¨ìêµ°",
+          "target": 589,
+          "thisWeek": 0,
+          "normal": 0,
+          "damage": 0,
+          "lost": 0
+        },
+        {
+          "sido": "ê²½ìë¶ë",
+          "sigungu": "ê²½ì°ì",
+          "target": 2124,
+          "thisWeek": 0,
+          "normal": 0,
+          "damage": 0,
+          "lost": 0
+        },
+        {
+          "sido": "ê²½ìë¶ë",
+          "sigungu": "êµ¬ë¯¸ì",
+          "target": 865,
+          "thisWeek": 0,
+          "normal": 0,
+          "damage": 0,
+          "lost": 0
+        },
+        {
+          "sido": "ê²½ìë¶ë",
+          "sigungu": "ìëêµ°",
+          "target": 814,
+          "thisWeek": 0,
+          "normal": 0,
+          "damage": 0,
+          "lost": 0
+        },
+        {
+          "sido": "ê²½ìë¶ë",
+          "sigungu": "ììêµ°",
+          "target": 471,
+          "thisWeek": 0,
+          "normal": 0,
+          "damage": 0,
+          "lost": 0
+        },
+        {
+          "sido": "ê²½ìë¶ë",
+          "sigungu": "ìì£¼ì",
+          "target": 2328,
+          "thisWeek": 0,
+          "normal": 0,
+          "damage": 0,
+          "lost": 0
+        },
+        {
+          "sido": "ê²½ìë¶ë",
+          "sigungu": "ìì²êµ°",
+          "target": 976,
+          "thisWeek": 0,
+          "normal": 0,
+          "damage": 0,
+          "lost": 0
+        },
+        {
+          "sido": "ê²½ìë¶ë",
+          "sigungu": "ì¸ì§êµ°",
+          "target": 398,
+          "thisWeek": 0,
+          "normal": 0,
+          "damage": 0,
+          "lost": 0
+        },
+        {
+          "sido": "ê²½ìë¶ë",
+          "sigungu": "ì²­ëêµ°",
+          "target": 60,
+          "thisWeek": 0,
+          "normal": 0,
+          "damage": 0,
+          "lost": 0
+        },
+        {
+          "sido": "ê²½ìë¶ë",
+          "sigungu": "ì²­ì¡êµ°",
+          "target": 2007,
+          "thisWeek": 0,
+          "normal": 0,
+          "damage": 0,
+          "lost": 0
+        }
+      ],
+      "reportText": {
+        "reporter": "ë¸íì",
+        "weeklyWork": "- íêµ­ì§ì­ì ë³´ê°ë°ì ìë£ìë ¹(ê¸°ì´ë²í¸í ëí, ìì±ìë£)\r\n- ê¸°ì¡´ë°ì´í°ì íì¬ ë°ì´í°ì ë¹êµë¶ì\r\n- ì¤ë§í¸KAIS íì¥ì¡°ì¬ ìì¤í ë§¤ë´ì¼ ìì±\r\n- íì¥ì¡°ì¬ ìì¤ë¬¼ ì ê² ë§¤ë´ì¼ ìì±",
+        "plan": "- ì§ìì²´ë³ ê¸°ì´ë°ì´í° ì ê²ìë íì\r\n- ì¤ë§í¸KAIS íì¥ì¡°ì¬ ìì¤í ë§¤ë´ì¼ ìì±\r\n- ì°©ìë³´ê³ ì ìì±\r\n- ì¬ììíê³íì ìì±\r\n- ìêµ¬ì¬í­ ì ìë¶ìì ìì±",
+        "note": "- ëêµ­ì§ìì´ìì¤ - í¹ì´ì¬í­ìì´"
+      }
+    },
+    "대국지아이에스": {
+      "uploadedAt": "2026-07-12T04:57:19.545Z",
       "regions": [
         {
           "sido": "강원특별자치도",
@@ -234,9 +461,9 @@
   },
   "regions": [
     {
-      "sido": "강원특별자치도",
-      "sigungu": "동해시",
-      "vendor": "대국지아이에스",
+      "sido": "ê°ìí¹ë³ìì¹ë",
+      "sigungu": "ëí´ì",
+      "vendor": "ëêµ­ì§ìì´ìì¤",
       "target": 405,
       "thisWeek": 0,
       "cumulative": 0,
@@ -249,9 +476,9 @@
       "note": ""
     },
     {
-      "sido": "강원특별자치도",
-      "sigungu": "영월군",
-      "vendor": "대국지아이에스",
+      "sido": "ê°ìí¹ë³ìì¹ë",
+      "sigungu": "ììêµ°",
+      "vendor": "ëêµ­ì§ìì´ìì¤",
       "target": 2397,
       "thisWeek": 0,
       "cumulative": 0,
@@ -264,9 +491,9 @@
       "note": ""
     },
     {
-      "sido": "경상남도",
-      "sigungu": "남해군",
-      "vendor": "대국지아이에스",
+      "sido": "ê²½ìë¨ë",
+      "sigungu": "ë¨í´êµ°",
+      "vendor": "ëêµ­ì§ìì´ìì¤",
       "target": 1015,
       "thisWeek": 0,
       "cumulative": 0,
@@ -279,9 +506,9 @@
       "note": ""
     },
     {
-      "sido": "경상남도",
-      "sigungu": "밀양시",
-      "vendor": "대국지아이에스",
+      "sido": "ê²½ìë¨ë",
+      "sigungu": "ë°ìì",
+      "vendor": "ëêµ­ì§ìì´ìì¤",
       "target": 1104,
       "thisWeek": 0,
       "cumulative": 0,
@@ -294,9 +521,9 @@
       "note": ""
     },
     {
-      "sido": "경상남도",
-      "sigungu": "사천시",
-      "vendor": "대국지아이에스",
+      "sido": "ê²½ìë¨ë",
+      "sigungu": "ì¬ì²ì",
+      "vendor": "ëêµ­ì§ìì´ìì¤",
       "target": 1443,
       "thisWeek": 0,
       "cumulative": 0,
@@ -309,9 +536,9 @@
       "note": ""
     },
     {
-      "sido": "경상남도",
-      "sigungu": "양산시",
-      "vendor": "대국지아이에스",
+      "sido": "ê²½ìë¨ë",
+      "sigungu": "ìì°ì",
+      "vendor": "ëêµ­ì§ìì´ìì¤",
       "target": 782,
       "thisWeek": 0,
       "cumulative": 0,
@@ -324,9 +551,9 @@
       "note": ""
     },
     {
-      "sido": "경상남도",
-      "sigungu": "의령군",
-      "vendor": "대국지아이에스",
+      "sido": "ê²½ìë¨ë",
+      "sigungu": "ìë ¹êµ°",
+      "vendor": "ëêµ­ì§ìì´ìì¤",
       "target": 974,
       "thisWeek": 0,
       "cumulative": 0,
@@ -339,9 +566,9 @@
       "note": ""
     },
     {
-      "sido": "경상남도",
-      "sigungu": "진주시",
-      "vendor": "대국지아이에스",
+      "sido": "ê²½ìë¨ë",
+      "sigungu": "ì§ì£¼ì",
+      "vendor": "ëêµ­ì§ìì´ìì¤",
       "target": 787,
       "thisWeek": 0,
       "cumulative": 0,
@@ -354,9 +581,9 @@
       "note": ""
     },
     {
-      "sido": "경상남도",
-      "sigungu": "창원시 마산합포구",
-      "vendor": "대국지아이에스",
+      "sido": "ê²½ìë¨ë",
+      "sigungu": "ì°½ìì ë§ì°í©í¬êµ¬",
+      "vendor": "ëêµ­ì§ìì´ìì¤",
       "target": 312,
       "thisWeek": 0,
       "cumulative": 0,
@@ -369,9 +596,9 @@
       "note": ""
     },
     {
-      "sido": "경상남도",
-      "sigungu": "창원시 마산회원구",
-      "vendor": "대국지아이에스",
+      "sido": "ê²½ìë¨ë",
+      "sigungu": "ì°½ìì ë§ì°íìêµ¬",
+      "vendor": "ëêµ­ì§ìì´ìì¤",
       "target": 392,
       "thisWeek": 0,
       "cumulative": 0,
@@ -384,9 +611,9 @@
       "note": ""
     },
     {
-      "sido": "경상남도",
-      "sigungu": "창원시 성산구",
-      "vendor": "대국지아이에스",
+      "sido": "ê²½ìë¨ë",
+      "sigungu": "ì°½ìì ì±ì°êµ¬",
+      "vendor": "ëêµ­ì§ìì´ìì¤",
       "target": 43,
       "thisWeek": 0,
       "cumulative": 0,
@@ -399,9 +626,9 @@
       "note": ""
     },
     {
-      "sido": "경상남도",
-      "sigungu": "창원시 의창구",
-      "vendor": "대국지아이에스",
+      "sido": "ê²½ìë¨ë",
+      "sigungu": "ì°½ìì ìì°½êµ¬",
+      "vendor": "ëêµ­ì§ìì´ìì¤",
       "target": 76,
       "thisWeek": 0,
       "cumulative": 0,
@@ -414,9 +641,9 @@
       "note": ""
     },
     {
-      "sido": "경상남도",
-      "sigungu": "창원시 진해구",
-      "vendor": "대국지아이에스",
+      "sido": "ê²½ìë¨ë",
+      "sigungu": "ì°½ìì ì§í´êµ¬",
+      "vendor": "ëêµ­ì§ìì´ìì¤",
       "target": 208,
       "thisWeek": 0,
       "cumulative": 0,
@@ -429,9 +656,9 @@
       "note": ""
     },
     {
-      "sido": "경상남도",
-      "sigungu": "하동군",
-      "vendor": "대국지아이에스",
+      "sido": "ê²½ìë¨ë",
+      "sigungu": "íëêµ°",
+      "vendor": "ëêµ­ì§ìì´ìì¤",
       "target": 968,
       "thisWeek": 0,
       "cumulative": 0,
@@ -444,9 +671,9 @@
       "note": ""
     },
     {
-      "sido": "경상남도",
-      "sigungu": "함양군",
-      "vendor": "대국지아이에스",
+      "sido": "ê²½ìë¨ë",
+      "sigungu": "í¨ìêµ°",
+      "vendor": "ëêµ­ì§ìì´ìì¤",
       "target": 589,
       "thisWeek": 0,
       "cumulative": 0,
@@ -459,9 +686,9 @@
       "note": ""
     },
     {
-      "sido": "경상북도",
-      "sigungu": "경산시",
-      "vendor": "대국지아이에스",
+      "sido": "ê²½ìë¶ë",
+      "sigungu": "ê²½ì°ì",
+      "vendor": "ëêµ­ì§ìì´ìì¤",
       "target": 2124,
       "thisWeek": 0,
       "cumulative": 0,
@@ -474,9 +701,9 @@
       "note": ""
     },
     {
-      "sido": "경상북도",
-      "sigungu": "구미시",
-      "vendor": "대국지아이에스",
+      "sido": "ê²½ìë¶ë",
+      "sigungu": "êµ¬ë¯¸ì",
+      "vendor": "ëêµ­ì§ìì´ìì¤",
       "target": 865,
       "thisWeek": 0,
       "cumulative": 0,
@@ -489,9 +716,9 @@
       "note": ""
     },
     {
-      "sido": "경상북도",
-      "sigungu": "영덕군",
-      "vendor": "대국지아이에스",
+      "sido": "ê²½ìë¶ë",
+      "sigungu": "ìëêµ°",
+      "vendor": "ëêµ­ì§ìì´ìì¤",
       "target": 814,
       "thisWeek": 0,
       "cumulative": 0,
@@ -504,9 +731,9 @@
       "note": ""
     },
     {
-      "sido": "경상북도",
-      "sigungu": "영양군",
-      "vendor": "대국지아이에스",
+      "sido": "ê²½ìë¶ë",
+      "sigungu": "ììêµ°",
+      "vendor": "ëêµ­ì§ìì´ìì¤",
       "target": 471,
       "thisWeek": 0,
       "cumulative": 0,
@@ -519,9 +746,9 @@
       "note": ""
     },
     {
-      "sido": "경상북도",
-      "sigungu": "영주시",
-      "vendor": "대국지아이에스",
+      "sido": "ê²½ìë¶ë",
+      "sigungu": "ìì£¼ì",
+      "vendor": "ëêµ­ì§ìì´ìì¤",
       "target": 2328,
       "thisWeek": 0,
       "cumulative": 0,
@@ -534,9 +761,9 @@
       "note": ""
     },
     {
-      "sido": "경상북도",
-      "sigungu": "예천군",
-      "vendor": "대국지아이에스",
+      "sido": "ê²½ìë¶ë",
+      "sigungu": "ìì²êµ°",
+      "vendor": "ëêµ­ì§ìì´ìì¤",
       "target": 976,
       "thisWeek": 0,
       "cumulative": 0,
@@ -549,9 +776,9 @@
       "note": ""
     },
     {
-      "sido": "경상북도",
-      "sigungu": "울진군",
-      "vendor": "대국지아이에스",
+      "sido": "ê²½ìë¶ë",
+      "sigungu": "ì¸ì§êµ°",
+      "vendor": "ëêµ­ì§ìì´ìì¤",
       "target": 398,
       "thisWeek": 0,
       "cumulative": 0,
@@ -564,9 +791,9 @@
       "note": ""
     },
     {
-      "sido": "경상북도",
-      "sigungu": "청도군",
-      "vendor": "대국지아이에스",
+      "sido": "ê²½ìë¶ë",
+      "sigungu": "ì²­ëêµ°",
+      "vendor": "ëêµ­ì§ìì´ìì¤",
       "target": 60,
       "thisWeek": 0,
       "cumulative": 0,
@@ -579,9 +806,9 @@
       "note": ""
     },
     {
-      "sido": "경상북도",
-      "sigungu": "청송군",
-      "vendor": "대국지아이에스",
+      "sido": "ê²½ìë¶ë",
+      "sigungu": "ì²­ì¡êµ°",
+      "vendor": "ëêµ­ì§ìì´ìì¤",
       "target": 2007,
       "thisWeek": 0,
       "cumulative": 0,
@@ -594,9 +821,9 @@
       "note": ""
     },
     {
-      "sido": "경기도",
-      "sigungu": "김포시",
-      "vendor": "내가시스템",
+      "sido": "ê²½ê¸°ë",
+      "sigungu": "ê¹í¬ì",
+      "vendor": "ë´ê°ìì¤í",
       "target": 1959,
       "thisWeek": 0,
       "cumulative": 0,
@@ -609,9 +836,9 @@
       "note": ""
     },
     {
-      "sido": "경기도",
-      "sigungu": "성남시 분당구",
-      "vendor": "내가시스템",
+      "sido": "ê²½ê¸°ë",
+      "sigungu": "ì±ë¨ì ë¶ë¹êµ¬",
+      "vendor": "ë´ê°ìì¤í",
       "target": 11119,
       "thisWeek": 0,
       "cumulative": 0,
@@ -624,9 +851,9 @@
       "note": ""
     },
     {
-      "sido": "경기도",
-      "sigungu": "성남시 수정구",
-      "vendor": "내가시스템",
+      "sido": "ê²½ê¸°ë",
+      "sigungu": "ì±ë¨ì ìì êµ¬",
+      "vendor": "ë´ê°ìì¤í",
       "target": 450,
       "thisWeek": 0,
       "cumulative": 0,
@@ -639,9 +866,9 @@
       "note": ""
     },
     {
-      "sido": "경기도",
-      "sigungu": "성남시 중원구",
-      "vendor": "내가시스템",
+      "sido": "ê²½ê¸°ë",
+      "sigungu": "ì±ë¨ì ì¤ìêµ¬",
+      "vendor": "ë´ê°ìì¤í",
       "target": 20,
       "thisWeek": 0,
       "cumulative": 0,
@@ -654,9 +881,9 @@
       "note": ""
     },
     {
-      "sido": "서울특별시",
-      "sigungu": "금천구",
-      "vendor": "내가시스템",
+      "sido": "ìì¸í¹ë³ì",
+      "sigungu": "ê¸ì²êµ¬",
+      "vendor": "ë´ê°ìì¤í",
       "target": 73,
       "thisWeek": 0,
       "cumulative": 0,
@@ -669,9 +896,9 @@
       "note": ""
     },
     {
-      "sido": "서울특별시",
-      "sigungu": "서대문구",
-      "vendor": "내가시스템",
+      "sido": "ìì¸í¹ë³ì",
+      "sigungu": "ìëë¬¸êµ¬",
+      "vendor": "ë´ê°ìì¤í",
       "target": 163,
       "thisWeek": 0,
       "cumulative": 0,
@@ -684,9 +911,9 @@
       "note": ""
     },
     {
-      "sido": "서울특별시",
-      "sigungu": "영등포구",
-      "vendor": "내가시스템",
+      "sido": "ìì¸í¹ë³ì",
+      "sigungu": "ìë±í¬êµ¬",
+      "vendor": "ë´ê°ìì¤í",
       "target": 211,
       "thisWeek": 0,
       "cumulative": 0,
@@ -699,9 +926,9 @@
       "note": ""
     },
     {
-      "sido": "경기도",
-      "sigungu": "안양시 동안구",
-      "vendor": "더퍼스트아이씨티",
+      "sido": "ê²½ê¸°ë",
+      "sigungu": "ììì ëìêµ¬",
+      "vendor": "ëí¼ì¤í¸ìì´ì¨í°",
       "target": 141,
       "thisWeek": 0,
       "cumulative": 0,
@@ -714,9 +941,9 @@
       "note": ""
     },
     {
-      "sido": "경기도",
-      "sigungu": "안양시 만안구",
-      "vendor": "더퍼스트아이씨티",
+      "sido": "ê²½ê¸°ë",
+      "sigungu": "ììì ë§ìêµ¬",
+      "vendor": "ëí¼ì¤í¸ìì´ì¨í°",
       "target": 210,
       "thisWeek": 0,
       "cumulative": 0,
@@ -729,9 +956,9 @@
       "note": ""
     },
     {
-      "sido": "경기도",
-      "sigungu": "용인시 기흥구",
-      "vendor": "더퍼스트아이씨티",
+      "sido": "ê²½ê¸°ë",
+      "sigungu": "ì©ì¸ì ê¸°í¥êµ¬",
+      "vendor": "ëí¼ì¤í¸ìì´ì¨í°",
       "target": 388,
       "thisWeek": 0,
       "cumulative": 0,
@@ -744,9 +971,9 @@
       "note": ""
     },
     {
-      "sido": "경기도",
-      "sigungu": "용인시 수지구",
-      "vendor": "더퍼스트아이씨티",
+      "sido": "ê²½ê¸°ë",
+      "sigungu": "ì©ì¸ì ìì§êµ¬",
+      "vendor": "ëí¼ì¤í¸ìì´ì¨í°",
       "target": 218,
       "thisWeek": 0,
       "cumulative": 0,
@@ -759,9 +986,9 @@
       "note": ""
     },
     {
-      "sido": "경기도",
-      "sigungu": "용인시 처인구",
-      "vendor": "더퍼스트아이씨티",
+      "sido": "ê²½ê¸°ë",
+      "sigungu": "ì©ì¸ì ì²ì¸êµ¬",
+      "vendor": "ëí¼ì¤í¸ìì´ì¨í°",
       "target": 3542,
       "thisWeek": 0,
       "cumulative": 0,
@@ -774,9 +1001,9 @@
       "note": ""
     },
     {
-      "sido": "전남광주통합특별시",
-      "sigungu": "광양시",
-      "vendor": "더퍼스트아이씨티",
+      "sido": "ì ë¨ê´ì£¼íµí©í¹ë³ì",
+      "sigungu": "ê´ìì",
+      "vendor": "ëí¼ì¤í¸ìì´ì¨í°",
       "target": 1484,
       "thisWeek": 0,
       "cumulative": 0,
@@ -789,9 +1016,9 @@
       "note": ""
     },
     {
-      "sido": "전남광주통합특별시",
-      "sigungu": "구례군",
-      "vendor": "더퍼스트아이씨티",
+      "sido": "ì ë¨ê´ì£¼íµí©í¹ë³ì",
+      "sigungu": "êµ¬ë¡êµ°",
+      "vendor": "ëí¼ì¤í¸ìì´ì¨í°",
       "target": 395,
       "thisWeek": 0,
       "cumulative": 0,
@@ -804,9 +1031,9 @@
       "note": ""
     },
     {
-      "sido": "전남광주통합특별시",
-      "sigungu": "나주시",
-      "vendor": "더퍼스트아이씨티",
+      "sido": "ì ë¨ê´ì£¼íµí©í¹ë³ì",
+      "sigungu": "ëì£¼ì",
+      "vendor": "ëí¼ì¤í¸ìì´ì¨í°",
       "target": 683,
       "thisWeek": 0,
       "cumulative": 0,
@@ -819,9 +1046,9 @@
       "note": ""
     },
     {
-      "sido": "전남광주통합특별시",
-      "sigungu": "목포시",
-      "vendor": "더퍼스트아이씨티",
+      "sido": "ì ë¨ê´ì£¼íµí©í¹ë³ì",
+      "sigungu": "ëª©í¬ì",
+      "vendor": "ëí¼ì¤í¸ìì´ì¨í°",
       "target": 357,
       "thisWeek": 0,
       "cumulative": 0,
@@ -834,9 +1061,9 @@
       "note": ""
     },
     {
-      "sido": "전남광주통합특별시",
-      "sigungu": "신안군",
-      "vendor": "더퍼스트아이씨티",
+      "sido": "ì ë¨ê´ì£¼íµí©í¹ë³ì",
+      "sigungu": "ì ìêµ°",
+      "vendor": "ëí¼ì¤í¸ìì´ì¨í°",
       "target": 519,
       "thisWeek": 0,
       "cumulative": 0,
@@ -849,9 +1076,9 @@
       "note": ""
     },
     {
-      "sido": "전남광주통합특별시",
-      "sigungu": "장흥군",
-      "vendor": "더퍼스트아이씨티",
+      "sido": "ì ë¨ê´ì£¼íµí©í¹ë³ì",
+      "sigungu": "ì¥í¥êµ°",
+      "vendor": "ëí¼ì¤í¸ìì´ì¨í°",
       "target": 640,
       "thisWeek": 0,
       "cumulative": 0,
@@ -864,9 +1091,9 @@
       "note": ""
     },
     {
-      "sido": "전남광주통합특별시",
-      "sigungu": "함평군",
-      "vendor": "더퍼스트아이씨티",
+      "sido": "ì ë¨ê´ì£¼íµí©í¹ë³ì",
+      "sigungu": "í¨íêµ°",
+      "vendor": "ëí¼ì¤í¸ìì´ì¨í°",
       "target": 660,
       "thisWeek": 0,
       "cumulative": 0,
@@ -879,9 +1106,9 @@
       "note": ""
     },
     {
-      "sido": "전남광주통합특별시",
-      "sigungu": "해남군",
-      "vendor": "더퍼스트아이씨티",
+      "sido": "ì ë¨ê´ì£¼íµí©í¹ë³ì",
+      "sigungu": "í´ë¨êµ°",
+      "vendor": "ëí¼ì¤í¸ìì´ì¨í°",
       "target": 1530,
       "thisWeek": 0,
       "cumulative": 0,
@@ -894,9 +1121,9 @@
       "note": ""
     },
     {
-      "sido": "전남광주통합특별시",
-      "sigungu": "화순군",
-      "vendor": "더퍼스트아이씨티",
+      "sido": "ì ë¨ê´ì£¼íµí©í¹ë³ì",
+      "sigungu": "íìêµ°",
+      "vendor": "ëí¼ì¤í¸ìì´ì¨í°",
       "target": 994,
       "thisWeek": 0,
       "cumulative": 0,
@@ -909,9 +1136,9 @@
       "note": ""
     },
     {
-      "sido": "전남광주통합특별시",
-      "sigungu": "장성군",
-      "vendor": "새한항업",
+      "sido": "ì ë¨ê´ì£¼íµí©í¹ë³ì",
+      "sigungu": "ì¥ì±êµ°",
+      "vendor": "ìíí­ì",
       "target": 1449,
       "thisWeek": 0,
       "cumulative": 0,
@@ -924,9 +1151,9 @@
       "note": ""
     },
     {
-      "sido": "전북특별자치도",
-      "sigungu": "김제시",
-      "vendor": "새한항업",
+      "sido": "ì ë¶í¹ë³ìì¹ë",
+      "sigungu": "ê¹ì ì",
+      "vendor": "ìíí­ì",
       "target": 5801,
       "thisWeek": 0,
       "cumulative": 0,
@@ -939,9 +1166,9 @@
       "note": ""
     },
     {
-      "sido": "전북특별자치도",
-      "sigungu": "남원시",
-      "vendor": "새한항업",
+      "sido": "ì ë¶í¹ë³ìì¹ë",
+      "sigungu": "ë¨ìì",
+      "vendor": "ìíí­ì",
       "target": 768,
       "thisWeek": 0,
       "cumulative": 0,
@@ -954,9 +1181,9 @@
       "note": ""
     },
     {
-      "sido": "전북특별자치도",
-      "sigungu": "순창군",
-      "vendor": "새한항업",
+      "sido": "ì ë¶í¹ë³ìì¹ë",
+      "sigungu": "ìì°½êµ°",
+      "vendor": "ìíí­ì",
       "target": 1333,
       "thisWeek": 0,
       "cumulative": 0,
@@ -969,9 +1196,9 @@
       "note": ""
     },
     {
-      "sido": "충청남도",
-      "sigungu": "계룡시",
-      "vendor": "새한항업",
+      "sido": "ì¶©ì²­ë¨ë",
+      "sigungu": "ê³ë£¡ì",
+      "vendor": "ìíí­ì",
       "target": 296,
       "thisWeek": 0,
       "cumulative": 0,
@@ -984,9 +1211,9 @@
       "note": ""
     },
     {
-      "sido": "충청남도",
-      "sigungu": "당진시",
-      "vendor": "새한항업",
+      "sido": "ì¶©ì²­ë¨ë",
+      "sigungu": "ë¹ì§ì",
+      "vendor": "ìíí­ì",
       "target": 693,
       "thisWeek": 0,
       "cumulative": 0,
@@ -999,9 +1226,9 @@
       "note": ""
     },
     {
-      "sido": "충청남도",
-      "sigungu": "보령시",
-      "vendor": "새한항업",
+      "sido": "ì¶©ì²­ë¨ë",
+      "sigungu": "ë³´ë ¹ì",
+      "vendor": "ìíí­ì",
       "target": 379,
       "thisWeek": 0,
       "cumulative": 0,
@@ -1014,9 +1241,9 @@
       "note": ""
     },
     {
-      "sido": "충청남도",
-      "sigungu": "서산시",
-      "vendor": "새한항업",
+      "sido": "ì¶©ì²­ë¨ë",
+      "sigungu": "ìì°ì",
+      "vendor": "ìíí­ì",
       "target": 347,
       "thisWeek": 0,
       "cumulative": 0,
@@ -1029,9 +1256,9 @@
       "note": ""
     },
     {
-      "sido": "충청남도",
-      "sigungu": "태안군",
-      "vendor": "새한항업",
+      "sido": "ì¶©ì²­ë¨ë",
+      "sigungu": "íìêµ°",
+      "vendor": "ìíí­ì",
       "target": 1502,
       "thisWeek": 0,
       "cumulative": 0,
@@ -1044,9 +1271,9 @@
       "note": ""
     },
     {
-      "sido": "강원특별자치도",
-      "sigungu": "고성군",
-      "vendor": "웨이즈원",
+      "sido": "ê°ìí¹ë³ìì¹ë",
+      "sigungu": "ê³ ì±êµ°",
+      "vendor": "ì¨ì´ì¦ì",
       "target": 1995,
       "thisWeek": 0,
       "cumulative": 0,
@@ -1059,9 +1286,9 @@
       "note": ""
     },
     {
-      "sido": "강원특별자치도",
-      "sigungu": "양구군",
-      "vendor": "웨이즈원",
+      "sido": "ê°ìí¹ë³ìì¹ë",
+      "sigungu": "ìêµ¬êµ°",
+      "vendor": "ì¨ì´ì¦ì",
       "target": 574,
       "thisWeek": 0,
       "cumulative": 0,
@@ -1074,9 +1301,9 @@
       "note": ""
     },
     {
-      "sido": "강원특별자치도",
-      "sigungu": "양양군",
-      "vendor": "웨이즈원",
+      "sido": "ê°ìí¹ë³ìì¹ë",
+      "sigungu": "ììêµ°",
+      "vendor": "ì¨ì´ì¦ì",
       "target": 244,
       "thisWeek": 0,
       "cumulative": 0,
@@ -1089,9 +1316,9 @@
       "note": ""
     },
     {
-      "sido": "강원특별자치도",
-      "sigungu": "춘천시",
-      "vendor": "웨이즈원",
+      "sido": "ê°ìí¹ë³ìì¹ë",
+      "sigungu": "ì¶ì²ì",
+      "vendor": "ì¨ì´ì¦ì",
       "target": 1611,
       "thisWeek": 0,
       "cumulative": 0,
@@ -1104,9 +1331,9 @@
       "note": ""
     },
     {
-      "sido": "강원특별자치도",
-      "sigungu": "홍천군",
-      "vendor": "웨이즈원",
+      "sido": "ê°ìí¹ë³ìì¹ë",
+      "sigungu": "íì²êµ°",
+      "vendor": "ì¨ì´ì¦ì",
       "target": 1839,
       "thisWeek": 0,
       "cumulative": 0,
@@ -1119,9 +1346,9 @@
       "note": ""
     },
     {
-      "sido": "경기도",
-      "sigungu": "동두천시",
-      "vendor": "웨이즈원",
+      "sido": "ê²½ê¸°ë",
+      "sigungu": "ëëì²ì",
+      "vendor": "ì¨ì´ì¦ì",
       "target": 461,
       "thisWeek": 0,
       "cumulative": 0,
@@ -1134,9 +1361,9 @@
       "note": ""
     },
     {
-      "sido": "경기도",
-      "sigungu": "여주시",
-      "vendor": "웨이즈원",
+      "sido": "ê²½ê¸°ë",
+      "sigungu": "ì¬ì£¼ì",
+      "vendor": "ì¨ì´ì¦ì",
       "target": 993,
       "thisWeek": 0,
       "cumulative": 0,
@@ -1149,9 +1376,9 @@
       "note": ""
     },
     {
-      "sido": "충청남도",
-      "sigungu": "금산군",
-      "vendor": "웨이즈원",
+      "sido": "ì¶©ì²­ë¨ë",
+      "sigungu": "ê¸ì°êµ°",
+      "vendor": "ì¨ì´ì¦ì",
       "target": 1462,
       "thisWeek": 0,
       "cumulative": 0,
@@ -1164,9 +1391,9 @@
       "note": ""
     },
     {
-      "sido": "충청북도",
-      "sigungu": "제천시",
-      "vendor": "웨이즈원",
+      "sido": "ì¶©ì²­ë¶ë",
+      "sigungu": "ì ì²ì",
+      "vendor": "ì¨ì´ì¦ì",
       "target": 1456,
       "thisWeek": 0,
       "cumulative": 0,
@@ -1179,9 +1406,9 @@
       "note": ""
     },
     {
-      "sido": "충청북도",
-      "sigungu": "청주시 상당구",
-      "vendor": "웨이즈원",
+      "sido": "ì¶©ì²­ë¶ë",
+      "sigungu": "ì²­ì£¼ì ìë¹êµ¬",
+      "vendor": "ì¨ì´ì¦ì",
       "target": 552,
       "thisWeek": 0,
       "cumulative": 0,
@@ -1194,9 +1421,9 @@
       "note": ""
     },
     {
-      "sido": "충청북도",
-      "sigungu": "청주시 서원구",
-      "vendor": "웨이즈원",
+      "sido": "ì¶©ì²­ë¶ë",
+      "sigungu": "ì²­ì£¼ì ììêµ¬",
+      "vendor": "ì¨ì´ì¦ì",
       "target": 79,
       "thisWeek": 0,
       "cumulative": 0,
@@ -1209,9 +1436,9 @@
       "note": ""
     },
     {
-      "sido": "충청북도",
-      "sigungu": "청주시 청원구",
-      "vendor": "웨이즈원",
+      "sido": "ì¶©ì²­ë¶ë",
+      "sigungu": "ì²­ì£¼ì ì²­ìêµ¬",
+      "vendor": "ì¨ì´ì¦ì",
       "target": 610,
       "thisWeek": 0,
       "cumulative": 0,
