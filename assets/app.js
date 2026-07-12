@@ -5,16 +5,6 @@
 
 // ---- GitHub PAT 자동 커밋 ----
 const LS_PAT = 'kaba_gh_pat';
-// ---- 업체 슬러그 매핑 ----
-const COMPANY_SLUG = {
-  '내가시스템':       'nega',
-  '대국지아이에스':   'dggis',
-  '더퍼스트아이씨티': 'thefirst',
-  '새한항업':         'saehan',
-  '웨이즈원':         'ways1'
-};
-const ALL_SLUGS = Object.values(COMPANY_SLUG);
-
 const GH_OWNER = 'dggis';
 const GH_REPO  = 'addr.chk.2026';
 const GH_BRANCH = 'main';
@@ -98,20 +88,36 @@ const LocalStore = {
     localStorage.setItem(LS_WEEKS, JSON.stringify(weeks));
     localStorage.removeItem(LS_MASTER_PREFIX+date);
   },
-  // fetch from GitHub — 새 형식(업체별 분할) + 구형식 fallback
+  // fetch from GitHub — 업체별 새형식 우선, 구형식 fallback
   async fetchRemoteWeek(date) {
-    // 1. 새 형식: 업체별 파일을 Promise.all로 병렬 로드
+    // 새형식: 업체별 파일 병렬 로드
+    const SLUGS = ['nega','dggis','thefirst','saehan','ways1'];
+    const SLUG_NAME = {nega:'내가시스템',dggis:'대국지아이에스',thefirst:'더퍼스트아이씨티',saehan:'새한항업',ways1:'웨이즈원'};
     try {
       const files = await Promise.all(
-        ALL_SLUGS.map(slug =>
+        SLUGS.map(slug =>
           fetch(`data/weekly/${slug}/${date}.json`, {cache:'no-store'})
-            .then(r => r.ok ? r.json() : null).catch(() => null)
+            .then(r => r.ok ? r.json() : null).catch(()=>null)
         )
       );
       const found = files.filter(Boolean);
-      if (found.length > 0) return mergeCompanyFiles(date, found);
+      if (found.length > 0) {
+        // 업체별 파일 병합
+        const master = {
+          baseDate: date, weekStart: found[0].weekStart||'', weekEnd: date,
+          uploadedAt: new Date().toISOString(), companyUploads: {}, regions: [], rollbackHistory: {}
+        };
+        const regionMap = {};
+        found.forEach(cf => {
+          if (!cf.company) return;
+          master.companyUploads[cf.company] = { uploadedAt:cf.uploadedAt, reportText:cf.reportText||{}, regions:cf.regions };
+          (cf.regions||[]).forEach(r => { regionMap[r.sido+'|'+r.sigungu] = {...r, vendor:cf.company}; });
+        });
+        master.regions = Object.values(regionMap);
+        return master;
+      }
     } catch {}
-    // 2. 구형식 fallback: data/weekly/{date}.json
+    // 구형식 fallback
     try {
       const res = await fetch(`data/weekly/${date}.json`, {cache:'no-store'});
       if (!res.ok) return null;
@@ -131,7 +137,7 @@ const LocalStore = {
 // ---- DataLayer ----
 const DataLayer = (() => {
   let remoteIdx = null;
-  const remoteCache = {};
+  const weekCache = {}; // 누적 계산 완료된 캐시
 
   async function listAllWeeks() {
     if (!remoteIdx) remoteIdx = await LocalStore.fetchRemoteIndex();
@@ -142,12 +148,53 @@ const DataLayer = (() => {
     return [...map.entries()].map(([date,src])=>({date,src})).sort((a,b)=>a.date.localeCompare(b.date));
   }
 
-  async function getWeek(date) {
+  // 원시 데이터(thisWeek만) 로드 — localStorage 우선, 없으면 GitHub
+  async function fetchRaw(date) {
     const local = LocalStore.getMasterWeek(date);
     if (local) return local;
-    const remote = await LocalStore.fetchRemoteWeek(date);
-    if (remote) return remote;
-    return null;
+    return await LocalStore.fetchRemoteWeek(date);
+  }
+
+  // 누적 계산 포함 — 항상 이전 주차 합산으로 계산
+  async function getWeek(date) {
+    if (weekCache[date]) return weekCache[date];
+
+    const raw = await fetchRaw(date);
+    if (!raw) return null;
+
+    // 이전 주차 목록
+    const allWeeks = await listAllWeeks();
+    const prevDates = allWeeks.map(w=>w.date).filter(d=>d<date).sort();
+
+    // 이전 주차 thisWeek 합산 → 누적맵
+    const cumulativeMap = {};
+    if (prevDates.length > 0) {
+      const prevRaws = await Promise.all(prevDates.map(d => fetchRaw(d)));
+      prevRaws.filter(Boolean).forEach(ps => {
+        (ps.regions||[]).forEach(r => {
+          const key = r.sido + '|' + r.sigungu;
+          cumulativeMap[key] = (cumulativeMap[key]||0) + (r.thisWeek||0);
+        });
+      });
+    }
+
+    // 현재 주차 regions에 누적 반영
+    const regions = (raw.regions||[]).map(r => {
+      const key = r.sido + '|' + r.sigungu;
+      const prev = cumulativeMap[key] || 0;
+      const cumulative = prev + (r.thisWeek||0);
+      return {
+        ...r,
+        prevWeek:  prev,
+        cumulative,
+        remain:    (r.target||0) - cumulative,
+        progress:  r.target ? cumulative / r.target : 0
+      };
+    });
+
+    const result = { ...raw, regions };
+    weekCache[date] = result;
+    return result;
   }
 
   async function getLatestWeek() {
@@ -158,35 +205,6 @@ const DataLayer = (() => {
 
   return { listAllWeeks, getWeek, getLatestWeek };
 })();
-
-// ---- 업체별 파일 병합 (새 형식 → 마스터 포맷) ----
-function mergeCompanyFiles(date, companyFiles) {
-  const valid = companyFiles.filter(Boolean);
-  if (!valid.length) return null;
-  const master = {
-    baseDate: date,
-    weekStart: valid[0].weekStart || '',
-    weekEnd: date,
-    uploadedAt: new Date().toISOString(),
-    companyUploads: {},
-    regions: [],
-    rollbackHistory: {}
-  };
-  const regionMap = {};
-  valid.forEach(cf => {
-    master.companyUploads[cf.company] = {
-      uploadedAt: cf.uploadedAt,
-      reportText: cf.reportText || {},
-      regions: cf.regions
-    };
-    (cf.regions || []).forEach(r => {
-      const key = `${r.sido}|${r.sigungu}`;
-      regionMap[key] = { ...r, vendor: cf.company };
-    });
-  });
-  master.regions = Object.values(regionMap);
-  return master;
-}
 
 // ---- 집계 ----
 function totals(regions=[]) {
