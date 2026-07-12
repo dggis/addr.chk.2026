@@ -369,6 +369,15 @@ async function mergeAndSave(snap) {
   }
 
   if (!master) {
+    // 이전 주차 누적값 조회 (prevWeek 설정용)
+    const allLocalWeeks = LocalStore.listWeeks().filter(d => d < date).sort();
+    const prevDate = allLocalWeeks.length > 0 ? allLocalWeeks[allLocalWeeks.length - 1] : null;
+    const prevMaster = prevDate ? LocalStore.getMasterWeek(prevDate) : null;
+    const prevMap = {};
+    if (prevMaster?.regions) {
+      prevMaster.regions.forEach(r => { prevMap[`${r.sido}|${r.sigungu}`] = r; });
+    }
+
     // 완전 새 마스터 초기화
     master = {
       baseDate: date, weekStart: snap.weekStart, weekEnd: snap.weekEnd,
@@ -376,10 +385,12 @@ async function mergeAndSave(snap) {
       rollbackHistory: {}
     };
     cfg.companies.forEach(c => c.regions.forEach(r => {
+      const prev = prevMap[`${r.sido}|${r.sigungu}`];
       master.regions.push({
         sido:r.sido, sigungu:r.sigungu, vendor:c.name,
-        target:r.target, thisWeek:0, cumulative:0, prevWeek:0,
-        progress:0, remain:r.target, normal:0, damage:0, lost:0, note:''
+        target:r.target, thisWeek:0,
+        prevWeek: prev ? (prev.cumulative || 0) : 0,  // 이전 주 누적 → prevWeek
+        cumulative:0, progress:0, remain:r.target, normal:0, damage:0, lost:0, note:''
       });
     }));
   }
