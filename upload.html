@@ -329,12 +329,40 @@ async function mergeAndSave(snap) {
   let master = LocalStore.getMasterWeek(date);
   if (!master && GitHubCommit.hasPAT()) {
     try {
-      const ghFile = await GitHubCommit.getFile(`data/weekly/${date}.json`);
-      if (ghFile?.content) {
-        master = ghFile.content;
-        console.log(`GitHub에서 ${date} 기존 데이터 로드 (${Object.keys(master.companyUploads||{}).length}개 업체 보존)`);
+      // 새 형식: 업체별 파일 병렬 로드
+      const slugMap = _GH.SLUGS;
+      const entries = Object.entries(slugMap);
+      const files = await Promise.all(
+        entries.map(([name, slug]) =>
+          _GH.getFile(`data/weekly/${slug}/${date}.json`)
+            .then(f => f?.content || null).catch(() => null)
+        )
+      );
+      const found = files.filter(Boolean);
+      if (found.length > 0 && typeof mergeCompanyFiles === 'function') {
+        master = mergeCompanyFiles(date, found);
+        console.log(`GitHub 새형식: ${found.length}개 업체 데이터 병합 완료`);
+      } else if (found.length > 0) {
+        // mergeCompanyFiles 없을 경우 직접 병합
+        master = {
+          baseDate: date, weekStart: found[0].weekStart||'', weekEnd: date,
+          uploadedAt: new Date().toISOString(), companyUploads: {}, regions: [], rollbackHistory: {}
+        };
+        const regionMap = {};
+        found.forEach(cf => {
+          master.companyUploads[cf.company] = { uploadedAt:cf.uploadedAt, reportText:cf.reportText||{}, regions:cf.regions };
+          (cf.regions||[]).forEach(r => { regionMap[r.sido+'|'+r.sigungu] = {...r, vendor:cf.company}; });
+        });
+        master.regions = Object.values(regionMap);
       }
-    } catch(e) {}
+    } catch(e) { console.warn('GitHub 로드 실패:', e); }
+    // 구형식 fallback: data/weekly/{date}.json
+    if (!master) {
+      try {
+        const ghFile = await GitHubCommit.getFile(`data/weekly/${date}.json`);
+        if (ghFile?.content) { master = ghFile.content; console.log('구형식 fallback 사용'); }
+      } catch(e) {}
+    }
   }
 
   if (!master) {
@@ -485,14 +513,15 @@ $('#saveBtn').addEventListener('click', async ()=>{
   statusEl.style.display = 'block';
   statusEl.innerHTML = '⏳ 저장 중…';
   try {
-    const master = await mergeAndSave(PENDING);
-    const date = PENDING.dateStr;
+    const snap = PENDING;                         // snap 먼저 저장
+    const master = await mergeAndSave(snap);
+    const date = snap.dateStr;
     PENDING = null;
 
     if (GitHubCommit.hasPAT()) {
       statusEl.innerHTML = '⏳ GitHub에 자동 커밋 중…';
       try {
-        await GitHubCommit.commitWeek(date, master);
+        await GitHubCommit.commitWeek(date, snap); // snap 전달 (company 정보 포함)
         statusEl.innerHTML = `✅ <b>${date}</b> 주차가 GitHub에 저장되었습니다. 새로고침하면 바로 확인 가능합니다.`;
       } catch(gitErr) {
         statusEl.innerHTML = `💾 저장됨. GitHub 커밋 실패: ${gitErr.message}<br><span style="font-size:11px;">토큰 권한(repo)을 확인하거나 JSON 내보내기로 수동 커밋하세요.</span>`;
@@ -673,10 +702,30 @@ const _GH = {
     return true;
   },
 
-  async commitWeek(date, master) {
-    // 1. weekly 파일 저장
-    await this.putFile(`data/weekly/${date}.json`, master, `chore: ${date} 주차 데이터 업로드`);
-    // 2. index.json — GitHub 기존 목록 + 로컬 목록 + 새 날짜 → 합집합으로 저장
+  // 업체별 슬러그 매핑 (upload.html 자체 내장)
+  SLUGS: {
+    '내가시스템':'nega', '대국지아이에스':'dggis',
+    '더퍼스트아이씨티':'thefirst', '새한항업':'saehan', '웨이즈원':'ways1'
+  },
+
+  async commitWeek(date, snap) {
+    // snap = { company, dateStr, weekStart, weekEnd, reportText, regions, uploadedAt }
+    const slug = this.SLUGS[snap.company] || snap.company;
+    const companyData = {
+      company: snap.company, slug,
+      baseDate: date,
+      weekStart: snap.weekStart, weekEnd: snap.weekEnd,
+      uploadedAt: snap.uploadedAt || new Date().toISOString(),
+      reportText: snap.reportText || {},
+      regions: snap.regions
+    };
+    // 자기 파일만 씀 → 충돌 없음
+    await this.putFile(
+      `data/weekly/${slug}/${date}.json`,
+      companyData,
+      `chore: ${snap.company} ${date} 주차 데이터`
+    );
+    // index.json — 날짜 목록만 갱신 (weekly 파일 읽기 불필요)
     let ghWeeks = [];
     try {
       const idx = await this.getFile('data/index.json');
@@ -693,7 +742,7 @@ const _GH = {
 if (typeof GitHubCommit !== 'undefined') {
   GitHubCommit.getFile    = (p)    => _GH.getFile(p);
   GitHubCommit.putFile    = (p,o,m)=> _GH.putFile(p,o,m);
-  GitHubCommit.commitWeek = (d,m)  => _GH.commitWeek(d,m);
+  GitHubCommit.commitWeek = (d,s)  => _GH.commitWeek(d,s);  // s=snap
 }
 
 // ---- 초기화 ----
