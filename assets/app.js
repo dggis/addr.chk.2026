@@ -5,6 +5,16 @@
 
 // ---- GitHub PAT 자동 커밋 ----
 const LS_PAT = 'kaba_gh_pat';
+// ---- 업체 슬러그 매핑 ----
+const COMPANY_SLUG = {
+  '내가시스템':       'nega',
+  '대국지아이에스':   'dggis',
+  '더퍼스트아이씨티': 'thefirst',
+  '새한항업':         'saehan',
+  '웨이즈원':         'ways1'
+};
+const ALL_SLUGS = Object.values(COMPANY_SLUG);
+
 const GH_OWNER = 'dggis';
 const GH_REPO  = 'addr.chk.2026';
 const GH_BRANCH = 'main';
@@ -88,8 +98,20 @@ const LocalStore = {
     localStorage.setItem(LS_WEEKS, JSON.stringify(weeks));
     localStorage.removeItem(LS_MASTER_PREFIX+date);
   },
-  // fetch from GitHub (data/weekly/{date}.json)
+  // fetch from GitHub — 새 형식(업체별 분할) + 구형식 fallback
   async fetchRemoteWeek(date) {
+    // 1. 새 형식: 업체별 파일을 Promise.all로 병렬 로드
+    try {
+      const files = await Promise.all(
+        ALL_SLUGS.map(slug =>
+          fetch(`data/weekly/${slug}/${date}.json`, {cache:'no-store'})
+            .then(r => r.ok ? r.json() : null).catch(() => null)
+        )
+      );
+      const found = files.filter(Boolean);
+      if (found.length > 0) return mergeCompanyFiles(date, found);
+    } catch {}
+    // 2. 구형식 fallback: data/weekly/{date}.json
     try {
       const res = await fetch(`data/weekly/${date}.json`, {cache:'no-store'});
       if (!res.ok) return null;
@@ -136,6 +158,35 @@ const DataLayer = (() => {
 
   return { listAllWeeks, getWeek, getLatestWeek };
 })();
+
+// ---- 업체별 파일 병합 (새 형식 → 마스터 포맷) ----
+function mergeCompanyFiles(date, companyFiles) {
+  const valid = companyFiles.filter(Boolean);
+  if (!valid.length) return null;
+  const master = {
+    baseDate: date,
+    weekStart: valid[0].weekStart || '',
+    weekEnd: date,
+    uploadedAt: new Date().toISOString(),
+    companyUploads: {},
+    regions: [],
+    rollbackHistory: {}
+  };
+  const regionMap = {};
+  valid.forEach(cf => {
+    master.companyUploads[cf.company] = {
+      uploadedAt: cf.uploadedAt,
+      reportText: cf.reportText || {},
+      regions: cf.regions
+    };
+    (cf.regions || []).forEach(r => {
+      const key = `${r.sido}|${r.sigungu}`;
+      regionMap[key] = { ...r, vendor: cf.company };
+    });
+  });
+  master.regions = Object.values(regionMap);
+  return master;
+}
 
 // ---- 집계 ----
 function totals(regions=[]) {
