@@ -64,7 +64,7 @@
         <button class="btn sm" id="savePatBtn" style="flex:none;">토큰 저장</button>
         <a href="#" target="_blank" class="btn outline sm" style="flex:none;text-decoration:none;">토큰 발급하기</a>
       </div>
-      <p style="font-size:11px;color:var(--muted);margin:8px 0 0;">데이터 반영이 안된 경우, <b>Ctrl + Shift + Delete</b> 누른 후, [전체 기간(모든시간)] 선택 및 삭제 후 재접속하세요.</p>
+      <p style="font-size:11px;color:var(--muted);margin:8px 0 0;">데이터 반영이 안된 경우,  <b>Ctrl + Shift + Delete</b> 누른 후, [전체 기간(모든시간)] 선택 및 삭제 후 재접속하세요.</p>
     </div>
   </div>
 
@@ -104,6 +104,7 @@
     <div class="empty">불러오는 중…</div>
   </div>
 
+  
   <!-- 템플릿 다운로드 -->
   <div class="section-title">업체별 입력 템플릿 다운로드</div>
   <div class="card card-pad">
@@ -141,23 +142,16 @@
 let CONFIG = null;
 let PENDING = null;
 
-// [반영] 영문 파일명 생성을 위한 매핑 테이블 구성
-const COMPANY_MAP = {
-  '내가시스템': 'nega',
-  '대국지아이에스': 'dggis',
-  '더퍼스트아이씨티': 'thefirst',
-  '새한항업': 'saehan',
-  '웨이즈원': 'ways1'
-};
-
 // ---- 요일·날짜 헬퍼 ----
 function getWeekPeriod(thursdayStr) {
+  // 목요일 → 금주 금요일(전주) ~ 목요일
   const thu = new Date(thursdayStr);
   const fri = new Date(thu); fri.setDate(thu.getDate() - 6);
   const fmt = d => d.toISOString().slice(0,10);
   return { start: fmt(fri), end: fmt(thu) };
 }
 function parseFilename(name) {
+  // [업체명]기초번호판설치점검_주간보고_YYYYMMDD
   const m = name.match(/^\[([^\]]+)\].*?_(\d{8})/);
   if (!m) return null;
   const company = m[1];
@@ -166,12 +160,14 @@ function parseFilename(name) {
   return { company, dateStr };
 }
 function lastThursday() {
+  // 직전 목요일 (오늘이 목요일이면 오늘, 그 전이면 지난 목요일)
   const now = new Date();
-  const day = now.getDay();
-  const diff = (day - 4 + 7) % 7;
+  const day = now.getDay(); // 0=Sun,1=Mon,...4=Thu,5=Fri,6=Sat
+  const diff = (day - 4 + 7) % 7; // 목요일로부터 며칠 지났나
   const thu = new Date(now); thu.setDate(now.getDate() - diff);
   return thu.toISOString().slice(0,10);
 }
+function thisThursday() { return lastThursday(); }
 
 // ---- config 로드 ----
 async function loadConfig() {
@@ -185,13 +181,20 @@ async function loadConfig() {
   return CONFIG;
 }
 
+// ---- 업체 템플릿 파일명 ----
+function templateFilename(company) {
+  return `templates/[${company}]기초번호판설치점검_주간보고_템플릿.xlsx`;
+}
+
 // ---- 회사 상태 그리드 ----
 async function renderCompanyGrid(selectedDate) {
   const cfg = await loadConfig();
+  // 주차 선택 드롭다운 구성
   const sel = $('#statusWeekSelect');
   const allWeeks = await DataLayer.listAllWeeks();
   const defaultDate = selectedDate || lastThursday();
   if (sel.options.length === 0 || selectedDate === undefined) {
+    // 저장된 주차 + 오늘 기준 직전 목요일
     const dateSet = new Set(allWeeks.map(w=>w.date));
     dateSet.add(defaultDate);
     const sorted = [...dateSet].sort().reverse();
@@ -201,7 +204,6 @@ async function renderCompanyGrid(selectedDate) {
   }
   const currentWeek = sel.value || defaultDate;
   $('#currentWeekTag').textContent = `기준`;
-  
   const master = LocalStore.getMasterWeek(currentWeek) || await DataLayer.getWeek(currentWeek);
   const uploads = master?.companyUploads || {};
   const companies = cfg.companies.length ? cfg.companies : [
@@ -243,15 +245,20 @@ function handleFile(file) {
 
 function parseCompanyTemplate(buf, company, dateStr, fileName) {
   const wb = XLSX.read(buf, {type:'array', raw:true});
+
+  // 시트 1: 주간보고내용 (텍스트) — 키워드로 섹션 탐색
   let reportText = { reporter:'', weeklyWork:'', plan:'', note:'' };
   const ws1 = wb.Sheets['주간보고내용'];
   if (ws1) {
     const a = XLSX.utils.sheet_to_json(ws1, {header:1, defval:null, raw:false});
+    // 보고자: B3 (row2, col1)
     reportText.reporter = ((a[2]||[])[1] || '').toString().trim();
+    // 섹션별: 제목 행 찾고 다음 행 값 읽기
     function findNextCell(keyword) {
       for (let r=0; r<a.length; r++) {
         const rowStr = (a[r]||[]).map(c=>c==null?'':String(c)).join('');
         if (rowStr.includes(keyword)) {
+          // 다음 행의 A열 값 반환
           for (let nr=r+1; nr<=r+3; nr++) {
             const val = ((a[nr]||[])[0] || '').toString().trim();
             if (val && !val.startsWith('[입력]') && val.length > 2) return val;
@@ -265,6 +272,7 @@ function parseCompanyTemplate(buf, company, dateStr, fileName) {
     reportText.note       = findNextCell('기타');
   }
 
+  // 시트 2: 주간실적입력 (숫자)
   const ws2 = wb.Sheets['주간실적입력'];
   if (!ws2) return null;
   const aoa = XLSX.utils.sheet_to_json(ws2, {header:1, defval:null, raw:true});
@@ -284,7 +292,7 @@ function parseCompanyTemplate(buf, company, dateStr, fileName) {
       sido: String(sido).trim(),
       sigungu: String(row[idxSigungu]||'').trim(),
       target: parseFloat(row[idxTarget])||0,
-      thisWeek: parseFloat(row[idxThis])||0,
+      thisWeek: parseFloat(row[idxThis])||0,  // 0이어도 OK
       normal:0, damage:0, lost:0,
     });
   }
@@ -312,49 +320,94 @@ function showPreview(snap) {
   $('#saveStatus').style.display = 'none';
 }
 
-// [반영] 단일 병합 방식(mergeAndSave) 대신, 각 업체 전용 개별 파일로 독립 저장하는 함수 구현
-async function handleSplitUpload(snap) {
+// ---- 마스터에 병합 ----
+async function mergeAndSave(snap) {
+  const cfg = await loadConfig();
   const date = snap.dateStr;
-  const companyEng = COMPANY_MAP[snap.company];
-  
-  if (!companyEng) {
-    throw new Error(`알 수 없는 업체명입니다: ${snap.company}`);
+
+  // 1. 로컬 → 없으면 GitHub에서 읽기 (다른 업체가 이미 올린 데이터 보존)
+  let master = LocalStore.getMasterWeek(date);
+  if (!master && GitHubCommit.hasPAT()) {
+    try {
+      const ghFile = await GitHubCommit.getFile(`data/weekly/${date}.json`);
+      if (ghFile?.content) {
+        master = ghFile.content;
+        console.log(`GitHub에서 ${date} 기존 데이터 로드 (${Object.keys(master.companyUploads||{}).length}개 업체 보존)`);
+      }
+    } catch(e) {}
   }
 
-  // 1. 업체 개별 파일 저장 경로 지정 (예: data/weekly/nega-2026-07-16.json)
-  const targetPath = `data/weekly/${companyEng}-${date}.json`;
-
-  // 2. GitHub PAT 토큰이 있을 경우 깃허브에 개별 독립 파일 다이렉트 커밋
-  if (GitHubCommit.hasPAT()) {
-    await _GH.putFile(targetPath, snap, `upload: ${snap.company} 데이터 업로드 (${date})`);
-    
-    // 3. 전체 목록 조회를 위한 공용 인덱스 파일(index.json) 업데이트 실행
-    await appendToWeekIndex(date);
+  if (!master) {
+    // 완전 새 마스터 초기화
+    master = {
+      baseDate: date, weekStart: snap.weekStart, weekEnd: snap.weekEnd,
+      uploadedAt: new Date().toISOString(), companyUploads: {}, regions: [],
+      rollbackHistory: {}
+    };
+    cfg.companies.forEach(c => c.regions.forEach(r => {
+      master.regions.push({
+        sido:r.sido, sigungu:r.sigungu, vendor:c.name,
+        target:r.target, thisWeek:0, cumulative:0, prevWeek:0,
+        progress:0, remain:r.target, normal:0, damage:0, lost:0, note:''
+      });
+    }));
   }
-
-  // 4. 새 데이터 실시간 조립 반영을 위한 캐시 날리기
-  localStorage.removeItem(`week_${date}`);
+  // 롤백용 이전 데이터 저장
+  if (master.companyUploads[snap.company]) {
+    if (!master.rollbackHistory) master.rollbackHistory = {};
+    if (!master.rollbackHistory[snap.company]) master.rollbackHistory[snap.company] = [];
+    master.rollbackHistory[snap.company].push({
+      uploadedAt: master.companyUploads[snap.company].uploadedAt,
+      regions: master.companyUploads[snap.company].regions,
+    });
+    // 최대 3개 보관
+    if (master.rollbackHistory[snap.company].length > 3)
+      master.rollbackHistory[snap.company].shift();
+  }
+  // 이번 업체 데이터 갱신
+  master.companyUploads[snap.company] = { uploadedAt: snap.uploadedAt, regions: snap.regions, reportText: snap.reportText || {} };
+  // regions 배열 갱신
+  snap.regions.forEach(nr => {
+    const idx = master.regions.findIndex(r => r.sido===nr.sido && r.sigungu===nr.sigungu);
+    if (idx>=0) {
+      const pr = master.regions[idx];
+      pr.thisWeek = nr.thisWeek;
+      pr.normal = nr.normal; pr.damage = nr.damage; pr.lost = nr.lost;
+      // 누적: prevWeek + thisWeek (prevWeek는 이전 주차에서 불러옴)
+      pr.cumulative = pr.prevWeek + nr.thisWeek;
+      pr.remain = pr.target - pr.cumulative;
+      pr.progress = pr.target ? pr.cumulative/pr.target : 0;
+    }
+  });
+  master.uploadedAt = new Date().toISOString();
+  LocalStore.saveMasterWeek(date, master);
+  return master;
 }
 
-// [반영] 업로드된 주차 목록을 누적하는 인덱스 제어 함수
-async function appendToWeekIndex(dateStr) {
-  const indexPath = 'data/weekly/index.json';
-  let indexData = [];
-  
-  try {
-    const res = await fetch(indexPath, { cache: 'no-store' });
-    if (res.ok) indexData = await res.json();
-  } catch (e) { 
-    indexData = []; 
-  }
-
-  if (!Array.isArray(indexData)) indexData = [];
-
-  if (!indexData.includes(dateStr)) {
-    indexData.push(dateStr);
-    indexData.sort((a, b) => b.localeCompare(a)); // 최신 날짜순 정렬
-    await _GH.putFile(indexPath, indexData, `chore: 주차 인덱스 목록 갱신 (${dateStr})`);
-  }
+// ---- 롤백 ----
+function rollback(date, company, histIdx) {
+  const master = LocalStore.getMasterWeek(date);
+  if (!master?.rollbackHistory?.[company]?.[histIdx]) return;
+  const old = master.rollbackHistory[company][histIdx];
+  // 현재 데이터를 history에 추가
+  if (!master.rollbackHistory[company]) master.rollbackHistory[company] = [];
+  master.rollbackHistory[company].push({ uploadedAt: master.companyUploads[company]?.uploadedAt, regions: master.companyUploads[company]?.regions });
+  // 복원
+  master.companyUploads[company] = { uploadedAt: old.uploadedAt, regions: old.regions };
+  old.regions.forEach(nr => {
+    const idx = master.regions.findIndex(r=>r.sido===nr.sido && r.sigungu===nr.sigungu);
+    if (idx>=0) {
+      const pr = master.regions[idx];
+      pr.thisWeek = nr.thisWeek; pr.normal = nr.normal; pr.damage = nr.damage; pr.lost = nr.lost;
+      pr.cumulative = pr.prevWeek + nr.thisWeek;
+      pr.remain = pr.target - pr.cumulative;
+      pr.progress = pr.target ? pr.cumulative/pr.target : 0;
+    }
+  });
+  master.rollbackHistory[company].splice(histIdx, 1);
+  LocalStore.saveMasterWeek(date, master);
+  renderWeekHistory(); renderCompanyGrid();
+  alert(`${company} - ${old.uploadedAt.slice(0,16)} 버전으로 롤백했습니다.`);
 }
 
 // ---- 주차 이력 테이블 ----
@@ -364,24 +417,32 @@ async function renderWeekHistory() {
   if (!weeks.length) { $('#weekHistoryCard').innerHTML = `<div class="empty">저장된 주차가 없습니다</div>`; return; }
   let html = '<div style="padding:12px 14px;">';
   for (const date of weeks) {
-    const master = await DataLayer.getWeek(date); // [반영] 조각 파일을 합쳐서 가져오도록 변경
+    const master = LocalStore.getMasterWeek(date);
     if (!master) continue;
     const t = master.regions.reduce((a,r)=>({target:a.target+r.target, cumulative:a.cumulative+r.cumulative, thisWeek:a.thisWeek+r.thisWeek}), {target:0,cumulative:0,thisWeek:0});
     html += `<div class="rollback-row">
       <div>
-        <span class="period-tag">${master.weekStart || ''} ~ ${master.weekEnd || ''}</span>
+        <span class="period-tag">${master.weekStart} ~ ${master.weekEnd}</span>
         <span style="font-size:12px;font-weight:800;color:var(--navy);margin-left:8px;">${date}</span>
         <span style="font-size:11px;color:var(--muted);margin-left:6px;">누적 ${t.cumulative.toLocaleString()}건 / 금주 ${t.thisWeek.toLocaleString()}건</span>
       </div>
       <div style="display:flex;gap:6px;align-items:center;">`;
-    companies = cfg.companies.length ? cfg.companies : [
-      {name:'대국지아이에스'},{name:'내가시스템'},{name:'더퍼스트아이씨티'},{name:'새한항업'},{name:'웨이즈원'}
-    ];
-    companies.forEach(c => {
+    // 업체별 업로드 여부 뱃지
+    cfg.companies.forEach(c => {
       const done = !!master.companyUploads?.[c.name];
       html += `<span class="badge ${done?'ok':'muted'}" style="font-size:9px;">${c.name.slice(0,4)}</span>`;
     });
     html += `</div></div>`;
+    // 롤백 이력
+    cfg.companies.forEach(c => {
+      const hist = master.rollbackHistory?.[c.name] || [];
+      hist.forEach((h, i) => {
+        html += `<div style="padding:4px 0 4px 20px;font-size:11px;color:var(--muted);display:flex;align-items:center;justify-content:space-between;">
+          <span>↩ ${c.name} 이전버전: ${(h.uploadedAt||'').slice(0,16)}</span>
+          <button class="btn ghost" onclick="rollback('${date}','${c.name}',${i})" style="font-size:11px;padding:4px 8px;">복원</button>
+        </div>`;
+      });
+    });
   }
   html += '</div>';
   $('#weekHistoryCard').innerHTML = html;
@@ -408,6 +469,7 @@ $('#clearPatBtn').addEventListener('click', ()=>{
   if (confirm('GitHub 토큰을 삭제할까요?')) { GitHubCommit.clearPAT(); renderPatUI(); }
 });
 
+// ---- 저장 버튼 (PAT 있으면 자동 커밋) ----
 $('#pickBtn').addEventListener('click', ()=>$('#fileInput').click());
 $('#fileInput').addEventListener('change', e=>{ if(e.target.files[0]) handleFile(e.target.files[0]); });
 const dz = $('#dropZone');
@@ -415,28 +477,30 @@ const dz = $('#dropZone');
 ['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('drag');}));
 dz.addEventListener('drop', e=>{ const f=e.dataTransfer.files[0]; if(f) handleFile(f); });
 
-// [반영] 업로드 버튼 이벤트 리스너를 분할 독립 파일 저장 로직으로 교체 연동
+// ---- 이벤트 바인딩 ----
 $('#saveBtn').addEventListener('click', async ()=>{
   if (!PENDING) return;
   $('#saveBtn').disabled = true;
   const statusEl = $('#saveStatus');
   statusEl.style.display = 'block';
   statusEl.innerHTML = '⏳ 저장 중…';
-  
   try {
+    const master = await mergeAndSave(PENDING);
     const date = PENDING.dateStr;
-    
-    if (GitHubCommit.hasPAT()) {
-      statusEl.innerHTML = '⏳ GitHub에 업체별 전용 데이터 업로드 중…';
-      // 개별 분할 업로드 처리 호출
-      await handleSplitUpload(PENDING);
-      statusEl.innerHTML = `✅ <b>${PENDING.company}</b>의 <b>${date}</b> 주차 파일이 깃허브에 단독 저장되었습니다.`;
-    } else {
-      statusEl.innerHTML = `⚠️ GitHub 자동 커밋 설정을 완료하셔야 독립 업로드가 정상 공유됩니다.`;
-    }
-
     PENDING = null;
-    await renderCompanyGrid(date);
+
+    if (GitHubCommit.hasPAT()) {
+      statusEl.innerHTML = '⏳ GitHub에 자동 커밋 중…';
+      try {
+        await GitHubCommit.commitWeek(date, master);
+        statusEl.innerHTML = `✅ <b>${date}</b> 주차가 GitHub에 저장되었습니다. 새로고침하면 바로 확인 가능합니다.`;
+      } catch(gitErr) {
+        statusEl.innerHTML = `💾 저장됨. GitHub 커밋 실패: ${gitErr.message}<br><span style="font-size:11px;">토큰 권한(repo)을 확인하거나 JSON 내보내기로 수동 커밋하세요.</span>`;
+      }
+    } else {
+      statusEl.innerHTML = `💾 저장되었습니다. <b>GitHub 자동 커밋 설정</b>을 하면 즉시 공유할 수 있습니다.`;
+    }
+    await renderCompanyGrid();
     await renderWeekHistory();
     $('#previewCard').classList.add('hidden');
   } catch(e) {
@@ -456,6 +520,7 @@ function parseKaisFile(buf) {
   const ws = wb.Sheets[wsName];
   const aoa = XLSX.utils.sheet_to_json(ws, {header:1, defval:null, raw:true});
 
+  // 헤더 탐색 (행정구역, 점검진행상태 포함 행 찾기)
   let hdrIdx = -1;
   for (let i=0;i<aoa.length;i++) {
     const row = (aoa[i]||[]).map(c=>c==null?'':String(c));
@@ -463,14 +528,17 @@ function parseKaisFile(buf) {
   }
   if (hdrIdx<0) return null;
 
+  // 2행 헤더 합치기 (row hdrIdx + hdrIdx+1)
   const h1 = (aoa[hdrIdx]||[]).map(c=>c==null?'':String(c).trim());
   const h2 = (aoa[hdrIdx+1]||[]).map(c=>c==null?'':String(c).trim());
 
   const colArea   = h1.indexOf('행정구역');
+  // 점검진행상태 찾기
   let colStatus = -1;
   for (let i=0;i<h2.length;i++) { if (h2[i].includes('점검진행상태')||h1[i].includes('점검진행상태')) {colStatus=i;break;} }
   if (colArea<0) return null;
 
+  // 시군구별 집계
   const map = {};
   for (let r=hdrIdx+2; r<aoa.length; r++) {
     const row = aoa[r]; if (!row||!row[colArea]) continue;
@@ -506,6 +574,7 @@ function handleKaisFile(file) {
         kpiCard('점검완료', done.toLocaleString(), 'ok'),
         kpiCard('점검율', total?((done/total)*100).toFixed(1)+'%':'0%'),
       ].join('');
+      // 주차 선택 드롭다운 채우기
       const weeks = LocalStore.listWeeks();
       const sel = $('#kaisWeekSelect');
       if (weeks.length) {
@@ -526,11 +595,11 @@ function handleKaisFile(file) {
 $('#pickKaisBtn').addEventListener('click', ()=>$('#kaisFileInput').click());
 $('#kaisFileInput').addEventListener('change', e=>{ if(e.target.files[0]) handleKaisFile(e.target.files[0]); });
 
-$('#applyKaisBtn').addEventListener('click', async ()=>{
+$('#applyKaisBtn').addEventListener('click', ()=>{
   if (!KAIS_DATA) return;
   const date = $('#kaisWeekSelect').value;
   if (!date) { alert('적용할 주차를 선택하세요.'); return; }
-  const master = await DataLayer.getWeek(date);
+  const master = LocalStore.getMasterWeek(date);
   if (!master) { alert('해당 주차 데이터가 없습니다. 먼저 주간실적 파일을 업로드하세요.'); return; }
   let updated = 0;
   master.regions.forEach(r => {
@@ -549,6 +618,7 @@ $('#applyKaisBtn').addEventListener('click', async ()=>{
   alert(`${updated}개 지역의 정상/훼손/망실 데이터가 반영되었습니다.`);
 });
 
+// ---- 템플릿 다운로드 링크 (하드코딩으로 보장) ----
 async function renderTemplateLinks() {
   const companies = ['대국지아이에스','내가시스템','더퍼스트아이씨티','새한항업','웨이즈원'];
   const el = $('#templateLinks');
@@ -560,7 +630,8 @@ async function renderTemplateLinks() {
   ).join('');
 }
 
-// ---- GitHub 커밋 헬퍼 ----
+
+// ---- GitHub 커밋 헬퍼 (upload.html 자체 내장, app.js 독립) ----
 const _GH = {
   owner: 'dggis',
   repo:  'addr.chk.2026',
@@ -584,6 +655,7 @@ const _GH = {
   },
 
   async putFile(path, jsonObj, msg) {
+    // SHA 조회
     const existing = await this.getFile(path).catch(()=>null);
     const body = {
       message: msg,
@@ -599,12 +671,29 @@ const _GH = {
       throw new Error(err.message || `GitHub 오류 (${res.status})`);
     }
     return true;
+  },
+
+  async commitWeek(date, master) {
+    // 1. weekly 파일 저장
+    await this.putFile(`data/weekly/${date}.json`, master, `chore: ${date} 주차 데이터 업로드`);
+    // 2. index.json — GitHub 기존 목록 + 로컬 목록 + 새 날짜 → 합집합으로 저장
+    let ghWeeks = [];
+    try {
+      const idx = await this.getFile('data/index.json');
+      if (idx?.content?.weeks) ghWeeks = idx.content.weeks;
+    } catch(e) {}
+    const localWeeks = typeof LocalStore !== 'undefined' ? LocalStore.listWeeks() : [];
+    const merged = [...new Set([...ghWeeks, ...localWeeks, date])].sort();
+    await this.putFile('data/index.json', { weeks: merged }, `chore: index.json 갱신 (${date} 추가)`);
+    return merged;
   }
 };
 
+// GitHubCommit을 _GH로 오버라이드 (app.js의 구버전 덮어쓰기)
 if (typeof GitHubCommit !== 'undefined') {
   GitHubCommit.getFile    = (p)    => _GH.getFile(p);
   GitHubCommit.putFile    = (p,o,m)=> _GH.putFile(p,o,m);
+  GitHubCommit.commitWeek = (d,m)  => _GH.commitWeek(d,m);
 }
 
 // ---- 초기화 ----
