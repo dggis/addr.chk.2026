@@ -7,40 +7,7 @@
 <link rel="icon" href="data:,">
 <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" rel="stylesheet">
 <link rel="stylesheet" href="assets/style.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
-// ---- PC 마우스 드래그 스크롤 (chiprow) ----
-(function() {
-  function addDragScroll(el) {
-    if (!el) return;
-    let isDown = false, startX, scrollLeft;
-    el.addEventListener('mousedown', e => {
-      isDown = true; el.classList.add('grabbing');
-      startX = e.pageX - el.offsetLeft;
-      scrollLeft = el.scrollLeft;
-    });
-    el.addEventListener('mouseleave', () => { isDown = false; el.classList.remove('grabbing'); });
-    el.addEventListener('mouseup', () => { isDown = false; el.classList.remove('grabbing'); });
-    el.addEventListener('mousemove', e => {
-      if (!isDown) return;
-      e.preventDefault();
-      const x = e.pageX - el.offsetLeft;
-      el.scrollLeft = scrollLeft - (x - startX);
-    });
-  }
-  // chiprow 요소에 적용
-  document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.chiprow').forEach(addDragScroll);
-  });
-  // 동적으로 생성된 chiprow도 감지
-  const obs = new MutationObserver(() => {
-    document.querySelectorAll('.chiprow:not([data-drag])').forEach(el => {
-      el.setAttribute('data-drag','1'); addDragScroll(el);
-    });
-  });
-  obs.observe(document.body, {childList:true, subtree:true});
-})();
-
-</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -150,7 +117,6 @@ function renderSidoChips(regions) {
   $('#sidoChips').innerHTML = sidos.map(s=>`<button class="chip ${s===filter.sido?'active':''}" data-sido="${s}">${s}</button>`).join('');
   $$('#sidoChips .chip').forEach(b=>b.addEventListener('click', ()=>{
     filter.sido = b.dataset.sido;
-    // active 클래스 즉시 갱신
     $$('#sidoChips .chip').forEach(x=>x.classList.remove('active'));
     b.classList.add('active');
     renderSearch();
@@ -211,6 +177,30 @@ async function loadDate(date) {
   if (weeks.length===0) { $('#emptyState').classList.remove('hidden'); return; }
   $('#dataState').classList.remove('hidden');
   await loadDate(current);
+
+// ---- chiprow 마우스 드래그 스크롤 (PC) ----
+(function attachDragScroll() {
+  const els = document.querySelectorAll('.chiprow');
+  els.forEach(el => {
+    let isDragging = false, startX = 0, scrollStart = 0;
+    el.addEventListener('mousedown', e => {
+      isDragging = true;
+      startX = e.clientX;
+      scrollStart = el.scrollLeft;
+      el.style.cursor = 'grabbing';
+      e.preventDefault();
+    });
+    window.addEventListener('mouseup', () => {
+      if (!isDragging) return;
+      isDragging = false;
+      el.style.cursor = 'grab';
+    });
+    window.addEventListener('mousemove', e => {
+      if (!isDragging) return;
+      el.scrollLeft = scrollStart - (e.clientX - startX);
+    });
+  });
+})();
 })();
 </script>
 </body>
