@@ -213,6 +213,17 @@ async function renderCompanyGrid(selectedDate) {
     {name:'대국지아이에스'},{name:'내가시스템'},{name:'더퍼스트아이씨티'},{name:'새한항업'},{name:'웨이즈원'}
   ];
   $('#companyStatusGrid').innerHTML = companies.map(c => {
+    if (c.reportOnly) {
+      // 보고전용 업체: 수량 집계 없음 표시
+      const up = uploads[c.name];
+      const done = !!up;
+      const time = done ? new Date(up.uploadedAt).toLocaleString('ko-KR',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
+      return `<div class="co-card ${done?'done':'missing'}" style="border-style:dashed;">
+        <div class="co-name">${c.name}</div>
+        <div class="co-status" style="color:var(--muted);font-size:10px;">📋 보고전용 (수치 집계 없음)</div>
+        ${done?`<div class="co-time">${time}</div>`:''}
+      </div>`;
+    }
     const up = uploads[c.name];
     const done = !!up;
     const time = done ? new Date(up.uploadedAt).toLocaleString('ko-KR',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
@@ -666,7 +677,7 @@ $('#applyKaisBtn').addEventListener('click', ()=>{
 
 // ---- 템플릿 다운로드 링크 (하드코딩으로 보장) ----
 async function renderTemplateLinks() {
-  const companies = ['대국지아이에스','내가시스템','더퍼스트아이씨티','새한항업','웨이즈원'];
+  const companies = ['대국지아이에스','내가시스템','더퍼스트아이씨티','새한항업','웨이즈원','대한지리학회'];
   const el = $('#templateLinks');
   if (!el) return;
   el.innerHTML = companies.map(c =>
