@@ -210,7 +210,7 @@ async function renderCompanyGrid(selectedDate) {
   const master = LocalStore.getMasterWeek(currentWeek) || await DataLayer.getWeek(currentWeek);
   const uploads = master?.companyUploads || {};
   const companies = cfg.companies.length ? cfg.companies : [
-    {name:'대국지아이에스'},{name:'내가시스템'},{name:'더퍼스트아이씨티'},{name:'새한항업'},{name:'웨이즈원'}
+    {name:'대국지아이에스'},{name:'내가시스템'},{name:'더퍼스트아이씨티'},{name:'새한항업'},{name:'웨이즈원'},{name:'대한지리학회'}
   ];
   $('#companyStatusGrid').innerHTML = companies.map(c => {
     const up = uploads[c.name];
@@ -666,7 +666,7 @@ $('#applyKaisBtn').addEventListener('click', ()=>{
 
 // ---- 템플릿 다운로드 링크 (하드코딩으로 보장) ----
 async function renderTemplateLinks() {
-  const companies = ['대국지아이에스','내가시스템','더퍼스트아이씨티','새한항업','웨이즈원'];
+  const companies = ['대국지아이에스','내가시스템','더퍼스트아이씨티','새한항업','웨이즈원','대한지리학회'];
   const el = $('#templateLinks');
   if (!el) return;
   el.innerHTML = companies.map(c =>
