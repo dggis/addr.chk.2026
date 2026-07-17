@@ -210,23 +210,19 @@ async function renderCompanyGrid(selectedDate) {
   const master = LocalStore.getMasterWeek(currentWeek) || await DataLayer.getWeek(currentWeek);
   const uploads = master?.companyUploads || {};
   const companies = cfg.companies.length ? cfg.companies : [
-    {name:'대국지아이에스'},{name:'내가시스템'},{name:'더퍼스트아이씨티'},{name:'새한항업'},{name:'웨이즈원'}
+    {name:'대국지아이에스'},{name:'내가시스템'},{name:'더퍼스트아이씨티'},{name:'새한항업'},{name:'웨이즈원'},{name:'대한지리학회',reportOnly:true}
   ];
   $('#companyStatusGrid').innerHTML = companies.map(c => {
-    if (c.reportOnly) {
-      // 보고전용 업체: 수량 집계 없음 표시
-      const up = uploads[c.name];
-      const done = !!up;
-      const time = done ? new Date(up.uploadedAt).toLocaleString('ko-KR',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
-      return `<div class="co-card ${done?'done':'missing'}" style="border-style:dashed;">
-        <div class="co-name">${c.name}</div>
-        <div class="co-status" style="color:var(--muted);font-size:10px;">📋 보고전용 (수치 집계 없음)</div>
-        ${done?`<div class="co-time">${time}</div>`:''}
-      </div>`;
-    }
     const up = uploads[c.name];
     const done = !!up;
     const time = done ? new Date(up.uploadedAt).toLocaleString('ko-KR',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
+    if (c.reportOnly) {
+      return `<div class="co-card ${done?'done':'missing'}" style="border-style:dashed;">
+        <div class="co-name">${c.name}</div>
+        <div class="co-status" style="color:var(--muted);font-size:10px;">📋 보고전용</div>
+        ${done?`<div class="co-time">${time}</div>`:''}
+      </div>`;
+    }
     return `<div class="co-card ${done?'done':'missing'}">
       <div class="co-name">${c.name}</div>
       <div class="co-status ${done?'done':'missing'}">${done?'✅ 업로드 완료':'⏳ 미업로드'}</div>
@@ -286,34 +282,34 @@ function parseCompanyTemplate(buf, company, dateStr, fileName) {
     reportText.note       = findNextCell('기타');
   }
 
-  // 시트 2: 주간실적입력 (숫자) — 없으면 보고전용으로 처리
+  // 시트 2: 주간실적입력 (숫자)
   const ws2 = wb.Sheets['주간실적입력'];
+  if (!ws2) return null;
+  const aoa = XLSX.utils.sheet_to_json(ws2, {header:1, defval:null, raw:true});
+  const hdr = (aoa[3]||[]).map(c=>c==null?'':String(c).trim());
+  const idxSido   = hdr.indexOf('시도');
+  const idxSigungu= hdr.indexOf('시군구');
+  const idxTarget = hdr.indexOf('전체대상건수');
+  const idxThis   = hdr.indexOf('금주점검건수');
+  if (idxSido<0||idxSigungu<0) return null;
+
   const regions = [];
-  if (ws2) {
-    const aoa = XLSX.utils.sheet_to_json(ws2, {header:1, defval:null, raw:true});
-    const hdr = (aoa[3]||[]).map(c=>c==null?'':String(c).trim());
-    const idxSido   = hdr.indexOf('시도');
-    const idxSigungu= hdr.indexOf('시군구');
-    const idxTarget = hdr.indexOf('전체대상건수');
-    const idxThis   = hdr.indexOf('금주점검건수');
-    if (idxSido>=0 && idxSigungu>=0) {
-      for (let r=4; r<aoa.length; r++) {
-        const row = aoa[r]; if (!row) continue;
-        const sido    = row[idxSido];
-        const sigungu = row[idxSigungu];
-        if (!sido || !sigungu || String(sigungu).trim() === '') continue;
-        regions.push({
-          sido: String(sido).trim(),
-          sigungu: String(sigungu).trim(),
-          target: parseFloat(row[idxTarget])||0,
-          thisWeek: parseFloat(row[idxThis])||0,
-          normal:0, damage:0, lost:0,
-        });
-      }
-    }
+  for (let r=4; r<aoa.length; r++) {
+    const row = aoa[r]; if (!row) continue;
+    const sido    = row[idxSido];
+    const sigungu = row[idxSigungu];
+    // 합계행/안내행 건너뜀: sido 또는 sigungu가 없으면 스킵
+    // 주의: '전남광주통합특별시'처럼 '합'자 포함 시도명은 스킵하면 안 됨
+    if (!sido || !sigungu || String(sigungu).trim() === '') continue;
+    regions.push({
+      sido: String(sido).trim(),
+      sigungu: String(sigungu).trim(),
+      target: parseFloat(row[idxTarget])||0,
+      thisWeek: parseFloat(row[idxThis])||0,  // 0이어도 OK
+      normal:0, damage:0, lost:0,
+    });
   }
-  // 보고전용(주간실적입력 시트 없음)이면 regions=[] 그대로 진행
-  // reportText는 이미 파싱됨
+  if (!regions.length) return null;
 
   const {start, end} = getWeekPeriod(dateStr);
   return { company, dateStr, weekStart:start, weekEnd:end, fileName,
