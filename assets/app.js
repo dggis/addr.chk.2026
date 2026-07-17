@@ -68,6 +68,19 @@ const GitHubCommit = {
   }
 };
 
+// ---- config.json 로더 (전체 시군구 기준정보, 캐시) ----
+let _siteConfigCache = null;
+async function loadSiteConfig() {
+  if (_siteConfigCache) return _siteConfigCache;
+  try {
+    const res = await fetch('data/config.json', { cache: 'no-store' });
+    _siteConfigCache = await res.json();
+  } catch (e) {
+    _siteConfigCache = { companies: [] };
+  }
+  return _siteConfigCache;
+}
+
 // ---- LocalStore ----
 const LS_MASTER_PREFIX = 'kaba_master_';
 const LS_WEEKS = 'kaba_weeks';
@@ -90,28 +103,50 @@ const LocalStore = {
   },
   // fetch from GitHub — 업체별 새형식 우선, 구형식 fallback
   async fetchRemoteWeek(date) {
-    // 새형식: 업체별 파일 병렬 로드
-    const SLUGS = ['nega','dggis','thefirst','saehan','ways1'];
-    const SLUG_NAME = {nega:'내가시스템',dggis:'대국지아이에스',thefirst:'더퍼스트아이씨티',saehan:'새한항업',ways1:'웨이즈원'};
+    // 새형식: 업체별 파일 병렬 로드 (6개 업체 전체 — 대한지리학회 dkgs 포함)
+    const SLUGS = { '내가시스템':'nega', '대국지아이에스':'dggis', '더퍼스트아이씨티':'thefirst', '새한항업':'saehan', '웨이즈원':'ways1', '대한지리학회':'dkgs' };
     try {
+      const entries = Object.entries(SLUGS);
       const files = await Promise.all(
-        SLUGS.map(slug =>
+        entries.map(([, slug]) =>
           fetch(`data/weekly/${slug}/${date}.json`, {cache:'no-store'})
             .then(r => r.ok ? r.json() : null).catch(()=>null)
         )
       );
       const found = files.filter(Boolean);
       if (found.length > 0) {
-        // 업체별 파일 병합
+        // 1) config.json 기준으로 전체 시군구를 먼저 깔아서 분모(전체 대상건수)를 항상 고정
+        const cfg = await loadSiteConfig();
+        const regionMap = {};
+        (cfg.companies || []).forEach(c => {
+          (c.regions || []).forEach(r => {
+            regionMap[r.sido + '|' + r.sigungu] = {
+              sido: r.sido, sigungu: r.sigungu, vendor: c.name,
+              target: r.target, thisWeek: 0, normal: 0, damage: 0, lost: 0
+            };
+          });
+        });
+
+        // 2) 실제 업로드된 업체 파일로 해당 지역만 덮어쓰기 (아직 안 올린 업체는 target만 남고 0건 유지)
         const master = {
-          baseDate: date, weekStart: found[0].weekStart||'', weekEnd: date,
+          baseDate: date, weekStart: found[0].weekStart || '', weekEnd: date,
           uploadedAt: new Date().toISOString(), companyUploads: {}, regions: [], rollbackHistory: {}
         };
-        const regionMap = {};
         found.forEach(cf => {
           if (!cf.company) return;
-          master.companyUploads[cf.company] = { uploadedAt:cf.uploadedAt, reportText:cf.reportText||{}, regions:cf.regions };
-          (cf.regions||[]).forEach(r => { regionMap[r.sido+'|'+r.sigungu] = {...r, vendor:cf.company}; });
+          master.companyUploads[cf.company] = { uploadedAt: cf.uploadedAt, reportText: cf.reportText || {}, regions: cf.regions };
+          (cf.regions || []).forEach(r => {
+            const key = r.sido + '|' + r.sigungu;
+            if (regionMap[key]) {
+              regionMap[key].thisWeek = r.thisWeek || 0;
+              regionMap[key].normal = r.normal || 0;
+              regionMap[key].damage = r.damage || 0;
+              regionMap[key].lost = r.lost || 0;
+            } else {
+              // config.json에 없는 신규 지역(예외 케이스) — 그대로 추가
+              regionMap[key] = { ...r, vendor: cf.company };
+            }
+          });
         });
         master.regions = Object.values(regionMap);
         return master;
